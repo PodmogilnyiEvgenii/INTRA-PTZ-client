@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
         mc:Ignorable="d"
+        Closing="OptionsWindow_Closing"
+        Loaded="OptionsWindow_Loaded"
         x:Name="optionsWindow" Title="Настройки" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,8 +23,11 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        
-        <DockPanel Grid.Column="0" Grid.Row="0" Height="40" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="0" Height="30" Margin="10,0,10,0">
+            <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Сетевые настройки:" FontWeight="Bold"/>
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="1" Height="40" Margin="10,0,10,0">
             <TextBlock Width="100" Height="20" Margin="10,10,0,0" Text="IP адрес:" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left"/>
 
             <TextBox x:Name="ip1" Width="30" Height="20" Margin="10,10,0,0" Text="111" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
@@ -37,7 +42,7 @@
             <TextBox x:Name="ip4" Width="30" Height="20" Margin="2,10,10,0" Text="111" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>            
         </DockPanel>
                
-        <DockPanel Grid.Column="0" Grid.Row="1" Height="40" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="2" Height="40" Margin="10,0,10,0">
             <TextBlock Width="100" Height="20" Margin="10,10,0,0" Text="Маска подсети:" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Left"/>
 
             <TextBox x:Name="mask1" Width="30" Height="20" Margin="10,10,0,0" Text="111" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
@@ -52,15 +57,10 @@
             <TextBox x:Name="mask4" Width="30" Height="20" Margin="2,10,10,0" Text="111" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
         </DockPanel>
         
-        <DockPanel Grid.Column="0" Grid.Row="2" Height="40" Margin="10,0,10,0">
-            <TextBlock x:Name="port" HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Порт:"/>
-            <TextBox HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>            
-        </DockPanel>
-        
         <DockPanel Grid.Column="0" Grid.Row="3" Height="40" Margin="10,0,10,0">
-            <TextBlock x:Name="address" HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Адрес устройства:"/>
-            <TextBox HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
-        </DockPanel>
+            <TextBlock HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Порт:"/>
+            <TextBox x:Name="port" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>            
+        </DockPanel>  
 
         <DockPanel Grid.Column="0" Grid.Row="4" Height="40" Margin="10,0,10,0">            
         </DockPanel>
@@ -72,15 +72,15 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="7" Height="45" Margin="10,0,10,0">
-            <Button x:Name="optionsSave" Content="Сохранить" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="optionsSave_Click">
+            <Button x:Name="optionsSaveButton" Content="Сохранить" Margin="40,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="OptionsSaveButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
                     </Style>
                 </Button.Resources>
             </Button>
-            
-            <Button x:Name="optionsCancel" Content="Отмена" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="optionsCancel_Click">
+
+            <Button x:Name="optionsCancelButton" Content="Отмена" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="OptionsCancelButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>

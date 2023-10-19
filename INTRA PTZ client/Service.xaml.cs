@@ -14,26 +14,26 @@ using System.Windows.Shapes;
 
 namespace INTRA_PTZ_client
 {    
-    public partial class RouteWindow : Window
+    public partial class ServiceWindow : Window
     {
-        public RouteWindow()
+        public ServiceWindow()
         {
             InitializeComponent();
         }
-
-        private void RouteWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void ServiceWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
             Hide();
         }
 
-        private void RouteSaveButton_Click(object sender, RoutedEventArgs e)
+        private void RequestSendButton_Click(object sender, RoutedEventArgs e)
         {
-            routeWindow.Visibility = Visibility.Hidden;
+            
         }
-        private void RouteCancelButton_Click(object sender, RoutedEventArgs e)
+
+        private void ServiceCloseButton_Click(object sender, RoutedEventArgs e)
         {
-            routeWindow.Visibility = Visibility.Hidden;
+            serviceWindow.Visibility = Visibility.Hidden;
         }
     }
 }

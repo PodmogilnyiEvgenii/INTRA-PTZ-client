@@ -13,22 +13,47 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace INTRA_PTZ_client
-{    
+{
     public partial class OptionsWindow : Window
     {
         public OptionsWindow()
         {
-            InitializeComponent();            
+            InitializeComponent();
+        }
+        private void OptionsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            Hide();
         }
 
-        private void optionsSave_Click(object sender, RoutedEventArgs e)
+        private void OptionsWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            String[] ip = AppOptions.DeviceIp.Split('.');
+            ip1.Text = ip[0];
+            ip2.Text = ip[1];
+            ip3.Text = ip[2];
+            ip4.Text = ip[3];
+
+            ip = AppOptions.DeviceMask.Split('.');
+            mask1.Text = ip[0];
+            mask2.Text = ip[1];
+            mask3.Text = ip[2]; 
+            mask4.Text = ip[3];
+
+            port.Text=AppOptions.DevicePort.ToString();  
+        }
+
+        private void OptionsSaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            optionsWindow.Visibility = Visibility.Hidden;
+
+        }
+
+        private void OptionsCancelButton_Click(object sender, RoutedEventArgs e)
         {
             optionsWindow.Visibility = Visibility.Hidden;
         }
-        private void optionsCancel_Click(object sender, RoutedEventArgs e)
-        {
 
-            optionsWindow.Visibility = Visibility.Hidden;
-        }
+
     }
 }

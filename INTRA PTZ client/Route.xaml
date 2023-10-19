@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
         mc:Ignorable="d"
+        Closing="RouteWindow_Closing"
         x:Name="routeWindow" Title="Маршрут" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
@@ -19,7 +20,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" Height="45" Margin="10,0,10,0">
-            <Button x:Name="routeSave" Content="Сохранить" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="routeSave_Click">
+            <Button x:Name="routeSaveButton" Content="Сохранить" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteSaveButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -27,7 +28,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button x:Name="routeCancel" Content="Отмена" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="routeCancel_Click">
+            <Button x:Name="routeCancelButton" Content="Отмена" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteCancelButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
