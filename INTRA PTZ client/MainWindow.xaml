@@ -1,0 +1,60 @@
+﻿<Window x:Class="INTRA_PTZ_client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:INTRA_PTZ_client"
+        mc:Ignorable="d"
+        Title="INTRA PTZ client v1.0"  HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" >
+    <Grid x:Name="mainGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Column="0" Grid.Row="0" Height="20" Margin="10,0,10,0">
+            <Menu>
+                <MenuItem x:Name="configMenu" Header="Настройки" Height="20">
+                    <MenuItem x:Name="configMenuOpen" Header="Открыть.." Click="ConfigurationLoad_Click"/>
+                    <MenuItem x:Name="configMenuSave" Header="Сохранить.." Click="ConfigurationSave_Click"/>
+                    <MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>
+                </MenuItem> 
+            </Menu>
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="1" Height="45" Margin="10,0,10,0">
+            <Button x:Name="configButton" Content="Настройки" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="configButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>   
+
+            <Button x:Name="routeButton" Content="Маршрут" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="routeButton_Click"> 
+                <Button.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="2" Height="100" Margin="10,0,10,0">            
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="3" Height="100" Margin="10,0,10,0">
+        </DockPanel>
+
+        <StatusBar x:Name="statusBar" Grid.Column="0" Grid.Row="4" Margin="10,0,10,0" VerticalAlignment="Bottom">
+            <TextBlock x:Name="statusMessage" Height="20"/>
+        </StatusBar>
+
+    </Grid>
+</Window>
