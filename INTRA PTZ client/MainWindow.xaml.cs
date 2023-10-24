@@ -17,17 +17,33 @@ namespace INTRA_PTZ_client
 {
     public partial class MainWindow : Window
     {
-        private OptionsWindow optionsWindow=new OptionsWindow();
-        private RouteWindow routeWindow = new RouteWindow();
-        private ServiceWindow serviceWindow = new ServiceWindow();
-        private FindWindow findWindow = new FindWindow();
+        private OptionsWindow optionsWindow;
+        private RouteWindow routeWindow;
+        private ServiceWindow serviceWindow;
+        private FindWindow findWindow;
+        private Device device;
 
         public MainWindow()
-        {            
+        {
             InitializeComponent();
             address.Text = AppOptions.DeviceAdress.ToString();
-            speed.Text = AppOptions.DeviceSpeed.ToString();                
+            speed.Text = AppOptions.DeviceSpeed.ToString();
+
+            optionsWindow = new OptionsWindow();
+            routeWindow = new RouteWindow();
+            serviceWindow = new ServiceWindow(this);
+            findWindow = new FindWindow();
+
+            device = new Device(this);
+
+            System.Diagnostics.Trace.WriteLine("Start");              
         }
+
+        public OptionsWindow OptionsWindow { get => optionsWindow; set => optionsWindow = value; }
+        public RouteWindow RouteWindow { get => routeWindow; set => routeWindow = value; }
+        public ServiceWindow ServiceWindow { get => serviceWindow; set => serviceWindow = value; }
+        public FindWindow FindWindow { get => findWindow; set => findWindow = value; }
+        public Device Device { get => device; set => device = value; }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -56,34 +72,34 @@ namespace INTRA_PTZ_client
 
         private void ConfigButton_Click(object sender, RoutedEventArgs e)
         {
-            optionsWindow.Visibility = Visibility.Visible;
-            optionsWindow.Owner = this;
-            optionsWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;            
-            optionsWindow.ShowDialog();
+            OptionsWindow.Visibility = Visibility.Visible;
+            OptionsWindow.Owner = this;
+            OptionsWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            OptionsWindow.ShowDialog();
         }
 
         private void RouteButton_Click(object sender, RoutedEventArgs e)
         {
-            routeWindow.Visibility = Visibility.Visible;
-            routeWindow.Owner = this;
-            routeWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;            
-            routeWindow.ShowDialog();
+            RouteWindow.Visibility = Visibility.Visible;
+            RouteWindow.Owner = this;
+            RouteWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            RouteWindow.ShowDialog();
         }
 
         private void ServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            serviceWindow.Visibility = Visibility.Visible;
-            serviceWindow.Owner = this;
-            serviceWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;            
-            serviceWindow.ShowDialog();
+            ServiceWindow.Visibility = Visibility.Visible;
+            ServiceWindow.Owner = this;
+            ServiceWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            ServiceWindow.ShowDialog();
         }
 
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
-            findWindow.Visibility = Visibility.Visible;
-            findWindow.Owner = this;
-            findWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;            
-            findWindow.ShowDialog();
+            FindWindow.Visibility = Visibility.Visible;
+            FindWindow.Owner = this;
+            FindWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            FindWindow.ShowDialog();
         }
 
         //manual mode

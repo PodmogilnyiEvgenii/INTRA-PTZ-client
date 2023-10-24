@@ -21,8 +21,8 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.Row="0" Height="0" Margin="10,0,10,0">
-            <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="" FontWeight="Bold"/>            
+        <DockPanel Grid.Column="0" Grid.Row="0" Height="30" Margin="10,0,10,0">
+            <TextBlock x:Name="ipOptionsText" HorizontalAlignment="Center" Margin="0,5,0,0" VerticalAlignment="Top" Text="192.168.1.1:8888"/>            
         </DockPanel>
         
         <DockPanel Grid.Column="0" Grid.Row="1" Margin="10,0,10,0">
@@ -32,6 +32,7 @@
             <TextBox  Width="30" Height="20" Margin="2,10,0,0" Text="Dt1" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
             <TextBox  Width="30" Height="20" Margin="2,10,0,0" Text="Dt2" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
             <TextBox  Width="30" Height="20" Margin="2,10,0,0" Text="SS" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+            <TextBox  x:Name="isOnline" Width="90" Height="20" Margin="10,10,0,0" Text="status" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
         </DockPanel>
 
         <DockPanel Grid.Column="1" Grid.Row="2" Height="45" Margin="10,0,10,0"> 
@@ -52,7 +53,7 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="10,0,10,0">
-            <TextBox x:Name="answert1" Width="190" Height="20" Margin="2,10,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
+            <TextBox x:Name="answerTextBox" Width="190" Height="20" Margin="2,10,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="4" Height="45" Margin="10,0,10,0">            
