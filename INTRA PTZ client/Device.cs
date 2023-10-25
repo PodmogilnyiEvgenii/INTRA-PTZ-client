@@ -26,7 +26,18 @@ namespace INTRA_PTZ_client
             Udp = new UDP(this);
         }
 
-        public bool Online { get => online; set => online = value; }
+        public bool GetOnline()
+        {
+            return online;
+        }
+
+        public void SetOnline(bool value)
+        {
+            online = value;
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
+                            new Action(() => mainWindow.ServiceWindow.isOnline.Text = value ? "online" : "offline"));
+        }
+        
         public int Pan { get => pan; set => pan = value; }
         public int Tilt { get => tilt; set => tilt = value; }
         public UDP Udp { get => udp; set => udp = value; }

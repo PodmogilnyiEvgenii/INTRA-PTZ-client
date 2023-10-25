@@ -14,8 +14,8 @@ namespace INTRA_PTZ_client
         private MainWindow mainWindow;
 
         private Device device;
-        private UdpClient udpClient;
-        private UdpClient udpServer;
+        private UdpClient udpClient = new UdpClient();
+        
 
         public UDP(Device device)
         {
@@ -25,18 +25,18 @@ namespace INTRA_PTZ_client
 
         public void Connect()
         {
-            if (!device.Online)
+            if (!device.GetOnline())
             {
                 try
                 {
                     udpClient.Connect(AppOptions.DeviceIp, AppOptions.DevicePort);
                     udpClient.BeginReceive(new AsyncCallback(Received), null);
-                    device.Online = true;
+                    device.SetOnline(true);
                 }
                 catch (Exception e)
                 {
                     System.Diagnostics.Trace.WriteLine(e.ToString());                    
-                    device.Online = false;
+                    device.SetOnline(false);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace INTRA_PTZ_client
             try
             {
                 udpClient.Close();
-                device.Online = false;
+                device.SetOnline(false);
             }
             catch (Exception e)
             {
@@ -54,24 +54,23 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void SendCommand(String command)
+        public void SendCommand(Byte[] command)
         {
-            /*try
+            try
             {
-                if (device.Online)
+                if (device.GetOnline())
                 {
-                    Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
-                    //udpClient.Send(sendBytes, sendBytes.Length);
+                    
+                    udpClient.Send(command, command.Length);
 
-                    udpClient.SendAsync (sendBytes, new IPEndPoint(IPAddress.Parse("192.168.32.235"), 6000));
+                    //udpClient.SendAsync (sendBytes, new IPEndPoint(IPAddress.Parse("192.168.32.235"), 6000));
                 }
             }
             catch (Exception e)
             {
-                System.Diagnostics.Trace.WriteLine(e.ToString());                
-            }*/
-
-            using var sender = new UdpClient();
+                System.Diagnostics.Trace.WriteLine(e.ToString());  
+                device.SetOnline(false);
+            }            
         }
 
         private void Received(IAsyncResult res)
