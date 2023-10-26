@@ -9,7 +9,7 @@ namespace INTRA_PTZ_client
 {
     public static class AppOptions
     {
-        private static String deviceIp = "192.168.32.235";
+        private static String deviceIp = "10.130.250.197";
         private static String deviceMask = "255.255.255.0";
         private static int devicePort = 6000;
         private static int deviceAdress = 1;

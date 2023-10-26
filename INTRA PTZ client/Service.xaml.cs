@@ -29,7 +29,6 @@ namespace INTRA_PTZ_client
             isOnline.Text = mainWindow.Device.GetOnline() ? "online" : "offline";
             ipOptionsText.Text = AppOptions.DeviceIp + ":" + AppOptions.DevicePort + "  AD="+AppOptions.DeviceAdress;
             request1.Text = AppOptions.DeviceAdress.ToString();
-
         }
 
         private void ServiceWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -40,15 +39,14 @@ namespace INTRA_PTZ_client
 
         private void RequestSendButton_Click(object sender, RoutedEventArgs e)
         {
-            mainWindow.Device.Udp.Connect();
+            
             //mainWindow.Device.Udp.SendCommand("123456789");
             //Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0, 85, 0, 0));
 
             if (mainWindow.Device.GetOnline())
             {
-                isOnline.Text = "online";
-                mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 147, 99, 99, 99));
-                //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0, 8, 0, 1));
+                isOnline.Text = "online";  
             }
             else
             {

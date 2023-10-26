@@ -15,7 +15,7 @@ namespace INTRA_PTZ_client
 
         private Device device;
         private UdpClient udpClient = new UdpClient();
-        
+
 
         public UDP(Device device)
         {
@@ -25,19 +25,16 @@ namespace INTRA_PTZ_client
 
         public void Connect()
         {
-            if (!device.GetOnline())
+            try
             {
-                try
-                {
-                    udpClient.Connect(AppOptions.DeviceIp, AppOptions.DevicePort);
-                    udpClient.BeginReceive(new AsyncCallback(Received), null);
-                    device.SetOnline(true);
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Trace.WriteLine(e.ToString());                    
-                    device.SetOnline(false);
-                }
+                udpClient.Connect(AppOptions.DeviceIp, AppOptions.DevicePort);
+                udpClient.BeginReceive(new AsyncCallback(Received), null);
+                device.SetOnline(true);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+                device.SetOnline(false);
             }
         }
 
@@ -58,19 +55,21 @@ namespace INTRA_PTZ_client
         {
             try
             {
+                if (!device.GetOnline())
+                {
+                    Connect();
+                }
+
                 if (device.GetOnline())
                 {
-                    
                     udpClient.Send(command, command.Length);
-
-                    //udpClient.SendAsync (sendBytes, new IPEndPoint(IPAddress.Parse("192.168.32.235"), 6000));
-                }
+                }                
             }
             catch (Exception e)
             {
-                System.Diagnostics.Trace.WriteLine(e.ToString());  
+                System.Diagnostics.Trace.WriteLine(e.ToString());
                 device.SetOnline(false);
-            }            
+            }
         }
 
         private void Received(IAsyncResult res)
