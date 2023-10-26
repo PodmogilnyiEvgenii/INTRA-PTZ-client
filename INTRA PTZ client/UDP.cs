@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -78,10 +79,14 @@ namespace INTRA_PTZ_client
             byte[] received = udpClient.EndReceive(res, ref RemoteIpEndPoint);
 
             //MessageBox.Show(Encoding.UTF8.GetString(received));
+            System.Diagnostics.Trace.WriteLine(received.Length);
+            System.Diagnostics.Trace.WriteLine(BitConverter.ToString(received));
             udpClient.BeginReceive(new AsyncCallback(Received), null);
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background,
-                            new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = Encoding.UTF8.GetString(received)));
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                            new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
+
+            
         }
     }
 }

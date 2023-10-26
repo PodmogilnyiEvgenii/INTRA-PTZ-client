@@ -42,7 +42,7 @@ namespace INTRA_PTZ_client
             
             //mainWindow.Device.Udp.SendCommand("123456789");
             //Byte[] sendBytes = Encoding.ASCII.GetBytes(command);
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0, 85, 0, 0));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, 0x51, 0x00, 0x00));
 
             if (mainWindow.Device.GetOnline())
             {
