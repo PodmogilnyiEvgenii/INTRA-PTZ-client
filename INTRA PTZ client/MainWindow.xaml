@@ -27,7 +27,7 @@
                     <MenuItem x:Name="configMenuOpen" Header="Открыть.." Click="ConfigurationLoad_Click"/>
                     <MenuItem x:Name="configMenuSave" Header="Сохранить.." Click="ConfigurationSave_Click"/>
                     <MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>
-                </MenuItem> 
+                </MenuItem>                
             </Menu>
         </DockPanel>
 
