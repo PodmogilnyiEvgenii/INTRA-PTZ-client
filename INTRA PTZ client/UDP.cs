@@ -16,6 +16,7 @@ namespace INTRA_PTZ_client
 
         private Device device;
         private UdpClient udpClient = new UdpClient();
+        private readonly bool DEBUG = true;
 
 
         public UDP(Device device)
@@ -52,7 +53,7 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void SendCommand(Byte[] command)
+        public void SendCommand(byte[] command)
         {
             try
             {
@@ -64,7 +65,10 @@ namespace INTRA_PTZ_client
                 if (device.GetOnline())
                 {
                     udpClient.Send(command, command.Length);
-                }                
+
+                    if (DEBUG) System.Diagnostics.Trace.WriteLine("=> | " + BitConverter.ToString(command));
+
+                }
             }
             catch (Exception e)
             {
@@ -78,15 +82,16 @@ namespace INTRA_PTZ_client
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, AppOptions.DevicePort);
             byte[] received = udpClient.EndReceive(res, ref RemoteIpEndPoint);
 
-            //MessageBox.Show(Encoding.UTF8.GetString(received));
-            System.Diagnostics.Trace.WriteLine(received.Length);
-            System.Diagnostics.Trace.WriteLine(BitConverter.ToString(received));
+            //System.Diagnostics.Trace.WriteLine(received.Length);
+            if (DEBUG) System.Diagnostics.Trace.WriteLine("<= | " + PelcoDE.getDescriptionRequest(received[3]) + " | " + BitConverter.ToString(received)+ "\n");
+
+            device.parseRequest(received);
+
             udpClient.BeginReceive(new AsyncCallback(Received), null);
-
             System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
-                            new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
+                new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
 
-            
+
         }
     }
 }
