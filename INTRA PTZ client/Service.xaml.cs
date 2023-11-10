@@ -18,11 +18,7 @@ namespace INTRA_PTZ_client
 
         private void ServiceWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            isOnline.Text = mainWindow.Device.GetOnline() ? "online" : "offline";
-            ipText.Inlines.Clear();
-            ipText.Inlines.Add( AppOptions.DeviceIp); 
-            optionsText.Text = ":" + AppOptions.DevicePort + "  AD=" + AppOptions.DeviceAdress;
-
+            deviceDataText.Text = mainWindow.Device.getStatusString(); 
         }
 
         private void ServiceWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -33,51 +29,43 @@ namespace INTRA_PTZ_client
 
         private void RequestSendButton_Click(object sender, RoutedEventArgs e)
         {
-            /*mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00));
+            /*mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00));
             Task.WaitAll(new Task[] { Task.Delay(500) });
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getMaxPan"), 0x00, 0x00));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getMaxPan"), 0x00, 0x00));
             Task.WaitAll(new Task[] { Task.Delay(500) });
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00));
             Task.WaitAll(new Task[] { Task.Delay(500) });
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getMaxTilt"), 0x00, 0x00));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getMaxTilt"), 0x00, 0x00));
             */
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("set"), 0x00, 0x00));
-
-            if (mainWindow.Device.GetOnline())
-            {
-                isOnline.Text = "online";
-            }
-            else
-            {
-                isOnline.Text = "offline";
-            }
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("set"), 0x00, 0x00));            
         }
 
         private void RequestSendButton1_Click(object sender, RoutedEventArgs e)
         {           
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("setPan"), 0x00, 0x00));            
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x00, 0x01));   //0         
         }
 
         private void RequestSendButton2_Click(object sender, RoutedEventArgs e)
         {
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF3));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF5));   //90
         }
 
         private void RequestSendButton3_Click(object sender, RoutedEventArgs e)
         {
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("setPan"), 0x71, 0xE7));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x71, 0xE8));   //180
+            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTemperature"), 0x00, 0x00));
         }
 
         private void GetAllCoordinats_Click(object sender, RoutedEventArgs e)
         {
-            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
+            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
         }
 
         private void GetAllMaxCoordinats_Click(object sender, RoutedEventArgs e)
         {
-            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getAllMaxCoordinates"), 0x00, 0x00));
-            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(AppOptions.DeviceAdress, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
+            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getAllMaxCoordinates"), 0x00, 0x00));
+            mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
         }
 
 
@@ -89,15 +77,13 @@ namespace INTRA_PTZ_client
         internal void ShowAnswer(string answer)
         {
             answerTextBox.Text = answer;
-        }
-               
+        }  
+        
 
         private void Hyperlink_OpenWebConsole(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(/*e.Uri.AbsoluteUri*/"http://"+AppOptions.DeviceIp) { UseShellExecute = true });
+            Process.Start(new ProcessStartInfo(/*e.Uri.AbsoluteUri*/"http://"+ mainWindow.Device.Ip) { UseShellExecute = true });
             e.Handled = true;
         }
-
-
     }
 }

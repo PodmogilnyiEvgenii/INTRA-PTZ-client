@@ -16,17 +16,13 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.Row="0" Height="30" Margin="10,0,10,0">
-            <TextBlock  HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" >
-                <Hyperlink x:Name="ipText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">192.168.1.1</Hyperlink>
-            </TextBlock>
-            <TextBlock x:Name="optionsText" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text=":8888"/>
-            <TextBlock x:Name="isOnline" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Text="status"/>            
+        <DockPanel Grid.Column="0" Grid.Row="0" Height="30" Margin="10,0,10,0">                    
         </DockPanel>
         
         <DockPanel Grid.Column="0" Grid.Row="1" Height="40" Margin="10,0,10,0">
@@ -86,5 +82,12 @@
                 </Button.Resources>
             </Button>            
         </DockPanel>
+        
+        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,5,0" VerticalAlignment="Bottom">
+            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>
+            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
+                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
+            </TextBlock>
+        </StatusBar>
     </Grid>
 </Window>

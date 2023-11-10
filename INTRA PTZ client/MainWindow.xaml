@@ -27,7 +27,9 @@
                     <MenuItem x:Name="configMenuOpen" Header="Открыть.." Click="ConfigurationLoad_Click"/>
                     <MenuItem x:Name="configMenuSave" Header="Сохранить.." Click="ConfigurationSave_Click"/>
                     <MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>
-                </MenuItem>                
+                </MenuItem>
+                <MenuItem x:Name="isOnline" Header="Онлайн" Height="20" IsCheckable="true" IsChecked="False" Click="isOnline_Click">                    
+                </MenuItem>
             </Menu>
         </DockPanel>
 
@@ -56,7 +58,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button x:Name="findButton" Content="Поиск" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteButton_Click">
+            <Button x:Name="findButton" Content="Поиск" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="FindButton_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -69,11 +71,7 @@
             <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Ручной режим управления:" FontWeight="Bold"/>
         </DockPanel>
         
-        <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="10,0,10,0">
-            <TextBlock HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Адрес устройства:"/>
-            <TextBox x:Name="address" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
-
-            <TextBlock HorizontalAlignment="Left" Width="20" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text=""/>
+        <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="10,0,10,0">            
             <TextBlock HorizontalAlignment="Left" Width="115" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Скорость движения:"/>
             <TextBox x:Name="speed" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
         </DockPanel>
@@ -85,8 +83,11 @@
         <DockPanel Grid.Column="0" Grid.Row="5" Height="45" Margin="10,0,10,0">            
         </DockPanel>
 
-        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,10,0" VerticalAlignment="Bottom">
-            <TextBlock x:Name="statusMessage" Height="20" Text="Привет"/>
+        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,5,0" VerticalAlignment="Bottom">
+            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>   
+            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
+                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
+            </TextBlock>            
         </StatusBar>
 
     </Grid>
