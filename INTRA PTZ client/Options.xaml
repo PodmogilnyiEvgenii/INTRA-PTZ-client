@@ -62,7 +62,9 @@
             <TextBox x:Name="port" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>            
         </DockPanel>  
 
-        <DockPanel Grid.Column="0" Grid.Row="4" Height="40" Margin="10,0,10,0">            
+        <DockPanel Grid.Column="0" Grid.Row="4" Height="40" Margin="10,0,10,0">
+            <TextBlock HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Адрес устройства:"/>
+            <TextBox x:Name="address" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="5" Height="40" Margin="10,0,10,0">

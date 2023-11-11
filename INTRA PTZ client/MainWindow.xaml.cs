@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace INTRA_PTZ_client
 {
@@ -26,17 +17,32 @@ namespace INTRA_PTZ_client
         public MainWindow()
         {
             InitializeComponent();
-            address.Text = AppOptions.DeviceAdress.ToString();
-            speed.Text = AppOptions.DeviceSpeed.ToString();
 
-            optionsWindow = new OptionsWindow();
+            device = new Device(this);
+
+            speed.Text = device.MovingSpeed.ToString();
+            deviceDataText.Text = device.getStatusString();
+            isOnline.IsChecked = device.Udp.GetIsTimerOnline();
+
+            optionsWindow = new OptionsWindow(this);
             routeWindow = new RouteWindow();
             serviceWindow = new ServiceWindow(this);
             findWindow = new FindWindow();
 
-            device = new Device(this);
+            DispatcherTimer refreshTimer = new DispatcherTimer();
+            refreshTimer.Tick += RefreshTimer_Tick;
+            refreshTimer.Interval=TimeSpan.FromMilliseconds(1000);
+            refreshTimer.Start();  
 
-            System.Diagnostics.Trace.WriteLine("Start");              
+        }
+
+        private void RefreshTimer_Tick(object? sender, EventArgs e)
+        {
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            deviceDataText.Text = device.getStatusString()));
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            ServiceWindow.deviceDataText.Text = device.getStatusString()));
         }
 
         public OptionsWindow OptionsWindow { get => optionsWindow; set => optionsWindow = value; }
@@ -100,11 +106,27 @@ namespace INTRA_PTZ_client
             FindWindow.Owner = this;
             FindWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
             FindWindow.ShowDialog();
+
+            //MessageBox.Show(device.getStatusString());
+            //device.refreshStatus();
+            //device.Udp.SendCommand(PelcoDE.getCommand(device.Address, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
         }
 
         //manual mode
 
 
 
+
+        private void Hyperlink_OpenWebConsole(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(/*e.Uri.AbsoluteUri*/"http://" + device.Ip) { UseShellExecute = true });
+            e.Handled = true;
+        }
+
+        private void isOnline_Click(object sender, RoutedEventArgs e)
+        {
+            device.Udp.SetIsTimerOnline(!device.Udp.GetIsTimerOnline());
+            isOnline.IsChecked = device.Udp.GetIsTimerOnline();
+        }
     }
 }
