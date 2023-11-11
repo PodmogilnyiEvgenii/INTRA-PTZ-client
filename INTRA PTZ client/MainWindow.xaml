@@ -27,12 +27,14 @@
                     <MenuItem x:Name="configMenuOpen" Header="Открыть.." Click="ConfigurationLoad_Click"/>
                     <MenuItem x:Name="configMenuSave" Header="Сохранить.." Click="ConfigurationSave_Click"/>
                     <MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>
-                </MenuItem> 
+                </MenuItem>
+                <MenuItem x:Name="isOnline" Header="Онлайн" Height="20" IsCheckable="true" IsChecked="False" Click="isOnline_Click">                    
+                </MenuItem>
             </Menu>
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="1" Height="45" Margin="10,0,10,0">
-            <Button x:Name="configButton" Content="Настройки" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ConfigButton_Click">
+        <DockPanel Grid.Column="0" Grid.Row="1" >
+            <Button x:Name="configButton" Content="Настройки" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ConfigButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -40,7 +42,7 @@
                 </Button.Resources>
             </Button>   
 
-            <Button x:Name="routeButton" Content="Маршрут" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteButton_Click"> 
+            <Button x:Name="routeButton" Content="Маршрут" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteButton_Click"> 
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -48,7 +50,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button x:Name="serviceButton" Content="Сервис" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ServiceButton_Click">
+            <Button x:Name="serviceButton" Content="Сервис" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ServiceButton_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -56,7 +58,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button x:Name="findButton" Content="Поиск" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteButton_Click">
+            <Button x:Name="findButton" Content="Поиск" Margin="10,10,10,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="FindButton_Click">
                 <Button.Resources>
                     <Style TargetType="{x:Type Border}">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -65,28 +67,187 @@
             </Button>
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="2" Height="30" Margin="10,0,10,0">
-            <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Ручной режим управления:" FontWeight="Bold"/>
+        <DockPanel Grid.Column="0" Grid.Row="2" >
+            <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,5,0,5" VerticalAlignment="Top" Text="Ручной режим управления:" FontWeight="Bold"/> 
         </DockPanel>
         
-        <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="10,0,10,0">
-            <TextBlock HorizontalAlignment="Center" Width="100" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Адрес устройства:"/>
-            <TextBox x:Name="address" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
+        <DockPanel Grid.Column="0" Grid.Row="3">
+            <StackPanel Margin="0,15,10,0">
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="80" Height="20" Margin="10,5,0,5" VerticalAlignment="Top" Text="Горизонталь:"/>
+                    <TextBox x:Name="panField" HorizontalAlignment="Left" Width="45" Height="20" Margin="5,5,0,0" VerticalAlignment="Top" Text="0" TextAlignment="Center" PreviewTextInput="ValidationPanField"/>
+                </DockPanel>
+                
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="80" Height="20" Margin="10,5,0,5" VerticalAlignment="Top" Text="Вертикаль:"/>
+                    <TextBox x:Name="tiltField" HorizontalAlignment="Left" Width="45" Height="20" Margin="5,5,0,0" VerticalAlignment="Top" Text="0" TextAlignment="Center" PreviewTextInput="ValidationTiltField"/>
+                </DockPanel>
+                
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="80" Height="20" Margin="10,5,0,5" VerticalAlignment="Top" Text="Приближение:"/>
+                    <TextBox x:Name="zoomField" HorizontalAlignment="Left" Width="45" Height="20" Margin="5,5,0,0" VerticalAlignment="Top" Text="0" TextAlignment="Center" PreviewTextInput="ValidationZoomField"/>
+                </DockPanel>
+                
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="80" Height="20" Margin="10,5,0,5" VerticalAlignment="Top" Text="Фокус:"/>
+                    <TextBox x:Name="focusField" HorizontalAlignment="Left" Width="45" Height="20" Margin="5,5,0,0" VerticalAlignment="Top" Text="0" TextAlignment="Center" PreviewTextInput="ValidationFocusField"/>
+                </DockPanel>
+                
+                <DockPanel>
+                    <Button x:Name="setCoordinatesButton" Content="Установить" Margin="0,10,0,5" Width="80" Height="25" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SetCoordinatesButton_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </DockPanel>
+            </StackPanel>
 
-            <TextBlock HorizontalAlignment="Left" Width="20" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text=""/>
-            <TextBlock HorizontalAlignment="Left" Width="115" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Скорость движения:"/>
-            <TextBox x:Name="speed" HorizontalAlignment="Left" Width="50" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="11111" TextAlignment="Center"/>
+            <StackPanel Margin="10,0,10,0">
+                <TextBlock Height="20" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Top" Text="Скорость"/>
+
+                <Button x:Name="speedPlusButton" Margin="0,0,0,5" Width="19" Height="19" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SpeedPlusButton_Click">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel>
+                        <Image Source="/Resources/Main_btPlus.png" Stretch="Uniform"/>
+                    </StackPanel>
+                </Button>
+
+                <Slider x:Name="speedSleder" Margin="0,0,0,0" Height="79" HorizontalAlignment="Center" VerticalAlignment="Top" Minimum="1" Maximum="8" Value="1" Orientation="Vertical" IsSnapToTickEnabled="True" TickFrequency="1"/>
+
+                <Button x:Name="speedMinusButton" Margin="0,8,0,5" Width="19" Height="19" HorizontalAlignment="Center" VerticalAlignment="Top" Click="SpeedMinusButton_Click">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="3"/>
+                        </Style>
+                    </Button.Resources>
+                    <StackPanel>
+                        <Image Source="/Resources/Main_btMinus.png" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            
+            <StackPanel Margin="10,15,0,0">
+                <DockPanel>
+                    <Button x:Name="button7" Margin="0,5,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button7_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt7.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button8" Margin="20,5,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button8_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt8.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button9" Margin="20,5,10,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button9_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt9.png" />
+                        </StackPanel>
+                    </Button>                    
+                </DockPanel>
+
+                <DockPanel>
+                    <Button x:Name="button4" Margin="0,10,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button4_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt4.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button5" Margin="20,10,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button5_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt5.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button6" Margin="20,10,10,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button6_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt6.png" />
+                        </StackPanel>
+                    </Button>
+                </DockPanel>
+
+                <DockPanel>
+                    <Button x:Name="button1" Margin="0,10,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button1_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt1.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button2" Margin="20,10,0,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button2_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt2.png" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="button3" Margin="20,10,10,10" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button3_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                        <StackPanel>
+                            <Image Source="/Resources/Main_bt3.png" />
+                        </StackPanel>
+                    </Button>
+                </DockPanel>
+            </StackPanel>
+
+            
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="4" Height="45" Margin="10,0,10,0">
-            <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="крест управления"/>
+        <DockPanel Grid.Column="0" Grid.Row="4" Height="15" Margin="10,0,10,0">            
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="5" Height="45" Margin="10,0,10,0">            
+        <DockPanel Grid.Column="0" Grid.Row="5" Height="15" Margin="10,0,10,0">
+            
         </DockPanel>
 
-        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,10,0" VerticalAlignment="Bottom">
-            <TextBlock x:Name="statusMessage" Height="20" Text="Привет"/>
+        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,5,0" VerticalAlignment="Bottom">
+            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>   
+            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
+                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
+            </TextBlock>            
         </StatusBar>
 
     </Grid>
