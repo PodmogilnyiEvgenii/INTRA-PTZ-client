@@ -24,7 +24,9 @@ namespace INTRA_PTZ_client
 
             device = new Device(this);
 
-            //speed.Text = device.MovingSpeed.ToString();
+            zoomField.IsEnabled = false;
+            focusField.IsEnabled = false;
+            
             deviceDataText.Text = device.getStatusString();
             isOnline.IsChecked = device.Udp.GetIsTimerOnline();
 
