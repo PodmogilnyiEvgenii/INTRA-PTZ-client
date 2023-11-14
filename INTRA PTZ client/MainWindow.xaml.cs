@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,18 +23,18 @@ namespace INTRA_PTZ_client
         {
             InitializeComponent();
 
-            device = new Device(this);
+            this.device = new Device(this);
 
             zoomField.IsEnabled = false;
             focusField.IsEnabled = false;
-            
-            deviceDataText.Text = device.getStatusString();
-            isOnline.IsChecked = device.Udp.GetIsTimerOnline();
 
-            optionsWindow = new OptionsWindow(this);
-            routeWindow = new RouteWindow();
-            serviceWindow = new ServiceWindow(this);
-            findWindow = new FindWindow();
+            deviceDataText.Text = device.getStatusString();
+            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
+
+            this.optionsWindow = new OptionsWindow(this);
+            this.routeWindow = new RouteWindow();
+            this.serviceWindow = new ServiceWindow(this);
+            this.findWindow = new FindWindow();
 
             DispatcherTimer refreshTimer = new DispatcherTimer();
             refreshTimer.Tick += RefreshTimer_Tick;
@@ -81,8 +82,8 @@ namespace INTRA_PTZ_client
         }
         private void isOnline_Click(object sender, RoutedEventArgs e)
         {
-            device.Udp.SetIsTimerOnline(!device.Udp.GetIsTimerOnline());
-            isOnline.IsChecked = device.Udp.GetIsTimerOnline();
+            device.Udp.UdpServices.SetIsTimerOnline(!device.Udp.UdpServices.GetIsTimerOnline());
+            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
         }
 
         //panel 1
@@ -127,7 +128,9 @@ namespace INTRA_PTZ_client
 
         private void SetCoordinatesButton_Click(object sender, RoutedEventArgs e)
         {
+            byte[] pan = BitConverter.GetBytes(Device.panAngleToStep(panField.Text));
 
+            Device.Udp.SendCommandOld(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]));   //90
         }
 
         private void Button7_Click(object sender, RoutedEventArgs e)
@@ -193,7 +196,7 @@ namespace INTRA_PTZ_client
             e.Handled = regex.IsMatch(e.Text);*/
 
             Regex regex = new Regex(@"^[0-9]*(?:\.[0-9]*)?$");
-            if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))                
+            if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))
                 e.Handled = false;
             else
                 e.Handled = true;
@@ -228,7 +231,7 @@ namespace INTRA_PTZ_client
             else
                 e.Handled = true;
 
-        }  
+        }
 
         //status bar
         private void Hyperlink_OpenWebConsole(object sender, RequestNavigateEventArgs e)

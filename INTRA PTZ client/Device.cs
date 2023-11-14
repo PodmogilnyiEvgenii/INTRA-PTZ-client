@@ -10,7 +10,7 @@ namespace INTRA_PTZ_client
     public class Device
     {
         private MainWindow mainWindow;
-        private UDP udp;        
+        private UDP udp;
 
         private string ip = "10.130.250.197";
         private string mask = "255.255.255.0";
@@ -24,6 +24,11 @@ namespace INTRA_PTZ_client
         private float currentZoom = 0;
         private float currentFocus = 0;
 
+        private int currentStepPan = 0;
+        private int currentStepTilt = 0;
+        //private int currentStepZoom = 0;
+        //private int currentStepFocus = 0;
+
         private int maxStepPan = 0;
         private int maxStepTilt = 0;
         private int maxStepZoom = 0;
@@ -31,26 +36,26 @@ namespace INTRA_PTZ_client
 
         private int temperature = 0;
 
-        private readonly int minPan = 0;
-        private readonly int maxPan = 360;
-        private readonly int minTilt = -90;
-        private readonly int maxTilt = 45;
+        private readonly float minPan = 0;
+        private readonly float maxPan = 359.99f;
+        private readonly float minTilt = -90;
+        private readonly float maxTilt = 45;
 
         public Device(MainWindow mainWindow)
         {
-            this.MainWindow = mainWindow;
-            Udp = new UDP(this);
+            this.mainWindow = mainWindow;
+            this.udp = new UDP(mainWindow, this);
         }
 
         public MainWindow MainWindow { get => mainWindow; set => mainWindow = value; }
-        public UDP Udp { get => udp; set => udp = value; }              
+        public UDP Udp { get => udp; set => udp = value; }
 
         public string Ip { get => ip; set => ip = value; }
         public string Mask { get => mask; set => mask = value; }
         public int Port { get => port; set => port = value; }
         public int Address { get => address; set => address = value; }
         public int MovingSpeed { get => movingSpeed; set => movingSpeed = value; }
-               
+
 
         public float GetCurrentZoom()
         {
@@ -72,6 +77,7 @@ namespace INTRA_PTZ_client
         {
             //TODO
             currentFocus = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+
         }
 
         public int GetTemperature()
@@ -90,7 +96,8 @@ namespace INTRA_PTZ_client
         }
         public void SetCurrentPan(byte hh, byte ll)
         {
-            currentPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 })*maxPan/maxStepPan;            
+            currentPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * maxPan / maxStepPan;
+            currentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
         public float GetCurrentTilt()
@@ -99,7 +106,8 @@ namespace INTRA_PTZ_client
         }
         public void SetCurrentTilt(byte hh, byte ll)
         {
-            currentTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 })*maxTilt/maxStepTilt;            
+            currentTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * maxTilt / maxStepTilt;
+            currentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
         public int GetMaxStepPan()
@@ -145,14 +153,14 @@ namespace INTRA_PTZ_client
         }
         public void SetOnline(bool value)
         {
-            isOnline = value;                        
+            isOnline = value;
         }
-        
+
 
         public String getStatusString()
         {
             return "IP: " + ip + ":" + port + "   " + "Address: " + address + "   " + (isOnline ? "Online" : "Offline") + "   Pan:" + currentPan + "   Tilt:" + currentTilt;
-        } 
+        }
 
         public void parseRequest(byte[] request)
         {
@@ -171,13 +179,52 @@ namespace INTRA_PTZ_client
                     case "MaxStepZoom": SetMaxStepZoom(request[4], request[5]); break;
                     case "MaxStepFocus": SetMaxStepFocus(request[4], request[5]); break;
 
-
                     case "Temperature": SetTemperature(request[4], request[5]); break;
 
                 }
             }
-            
+
         }
 
+        public override string ToString()
+        {
+            String res = "Pan= " + currentPan + "\n";
+            res += "Tilt= " + currentTilt + "\n";
+            res += "stepPan= " + currentStepPan + "\n";
+            res += "stepTilt= " + currentStepTilt + "\n";
+            res += "MaxStepPan= " + maxStepPan + "\n";
+            res += "MaxStepTilt= " + maxStepTilt + "\n";
+            res += "Temperature= " + temperature + "\n";
+            res += "Online= " + isOnline + "\n";
+
+            return res;
+        }
+
+        public int panAngleToStep(string angle)
+        {
+            try
+            {
+                System.Diagnostics.Trace.WriteLine(angle);
+                System.Diagnostics.Trace.WriteLine(float.Parse(angle) * maxStepPan / (maxPan - minPan));
+
+                return (int)Math.Round(float.Parse(angle) * maxStepPan / (maxPan - minPan));
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
+
+        public int tiltAngleToStep(string angle)
+        {
+            try
+            {
+                return (int)Math.Round(float.Parse(angle) * maxStepTilt / (maxTilt - minTilt));
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+        }
     }
 }

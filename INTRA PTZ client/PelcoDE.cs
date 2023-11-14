@@ -25,7 +25,7 @@ namespace INTRA_PTZ_client
             descriptionCommands.Add("getTemperature", 0x91);
 
 
-            descriptionCommands.Add("getAllCoordinates", 0x79);
+            //descriptionCommands.Add("getAllCoordinates", 0x79);
             descriptionCommands.Add("getAllMaxStepCoordinates", 0x7B);
 
             descriptionCommands.Add("setPan", 0x71);
@@ -53,7 +53,17 @@ namespace INTRA_PTZ_client
 
         public static string getDescriptionRequest(byte request)
         {
-            return descriptionRequests.ContainsKey(request) ?  descriptionRequests[request]: "Unknown key";
+            return descriptionRequests.ContainsKey(request) ? descriptionRequests[request] : "Unknown key";
+        }
+
+        public static byte getRequestByte(string request)
+        {
+            foreach (var descriptionRequest in descriptionRequests)
+            {
+                if (descriptionRequest.Value.Equals(request)) return descriptionRequest.Key;
+            }
+
+            return new byte();
         }
 
         public static byte[] getCommand(int address, byte k1, byte k2, byte dt1, byte dt2)
@@ -73,7 +83,7 @@ namespace INTRA_PTZ_client
             return command;
         }
 
-        
+
 
     }
 }

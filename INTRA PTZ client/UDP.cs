@@ -1,81 +1,49 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Threading;
-using Timer = System.Timers.Timer;
+
 
 namespace INTRA_PTZ_client
 {
     public class UDP
     {
         private MainWindow mainWindow;
-
         private Device device;
         private UdpClient udpClient = new UdpClient();
-        private readonly bool DEBUG = true;
+        private UDPservices udpServices;
+        private string lastAnswerString="";
 
-        private Timer coordinatesTimer;
-        private bool isTimerOnline = false;
+        public Device Device { get => device; set => device = value; }
+        public UDPservices UdpServices { get => udpServices; set => udpServices = value; }
 
-
-        public Timer CoordinatesTimer { get => coordinatesTimer; set => coordinatesTimer = value; }
-
-        public bool GetIsTimerOnline()
+        public UDP(MainWindow mainWindow, Device device)
         {
-            return isTimerOnline;
-        }
-
-        public void SetIsTimerOnline(bool value)
-        {
-            isTimerOnline = value;
-
-            if (value) CoordinatesTimer.Start(); else CoordinatesTimer.Stop();
-        }
-
-        public UDP(Device device)
-        {
-            this.mainWindow = device.MainWindow;
+            this.mainWindow = mainWindow;
             this.device = device;
+            this.udpServices = new UDPservices(device);
 
-            CoordinatesTimer = new Timer(1000);
-            CoordinatesTimer.AutoReset = true;
-            CoordinatesTimer.Elapsed += new ElapsedEventHandler(OnCoorditatesTimerEvent);
-        }
-
-        private void OnCoorditatesTimerEvent(Object source, ElapsedEventArgs e)
-        {
-            try
-            {
-                
-                //SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
-
-                SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00));
-                Thread.Sleep(500);
-                SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00));
-                
-
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Trace.WriteLine(ex.ToString());
-            }
+            if (device == null) System.Diagnostics.Trace.WriteLine("device null");
         }
 
         public void Connect()
         {
             try
             {
-                udpClient.Connect(device.Ip, device.Port);
+                udpClient.Connect(Device.Ip, Device.Port);
                 udpClient.BeginReceive(new AsyncCallback(Received), null);
-                device.SetOnline(true);
+                Device.SetOnline(true);
             }
             catch (Exception e)
             {
                 System.Diagnostics.Trace.WriteLine(e.ToString());
-                device.SetOnline(false);
+                Device.SetOnline(false);
             }
         }
 
@@ -84,7 +52,7 @@ namespace INTRA_PTZ_client
             try
             {
                 udpClient.Close();
-                device.SetOnline(false);
+                Device.SetOnline(false);
             }
             catch (Exception e)
             {
@@ -92,52 +60,100 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void SendCommand(byte[] command)
+        public void getFirstData()
+        {
+            if (Device.GetMaxStepPan() == 0 || Device.GetMaxStepTilt() == 0 || Device.GetMaxStepZoom() == 0 || Device.GetMaxStepFocus() == 0)
+            {
+                SendCommand(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00), "MaxStepFocus", 1000));
+            }
+        }
+
+        public void SendCommand(UdpCommand udpCommand)
         {
             try
             {
-                if (!device.GetOnline())
+                if (Device.GetOnline())
                 {
-                    Connect();
-                    if (device.GetMaxStepPan()==0 || device.GetMaxStepTilt()== 0 || device.GetMaxStepZoom() == 0 || device.GetMaxStepFocus() == 0)
+                    lastAnswerString = "";
+                    udpClient.Send(udpCommand.Request, udpCommand.Request.Length);
+
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "=> | " + BitConverter.ToString(udpCommand.Request));
+
+                    DateTime start = DateTime.Now;
+                    TimeSpan timeout;
+
+                    do
                     {
-                        SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
-                        Task.WaitAll(new Task[] { Task.Delay(500) });
-                    }
+                        Task.WaitAll(new Task[] { Task.Delay(50) });
+                        timeout = DateTime.Now - start;
+                        //System.Diagnostics.Trace.WriteLine(timeout.TotalMilliseconds);
+                        //System.Diagnostics.Trace.WriteLine(udpCommand.Timeout);
+
+                    } while (lastAnswerString != udpCommand.AnswerString && timeout.TotalMilliseconds < udpCommand.Timeout);
+
+                    if (timeout.TotalMilliseconds > udpCommand.Timeout) Device.SetOnline(false);
+
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Answer in " + timeout.TotalMilliseconds);
                 }
-
-                if (device.GetOnline())
+                else
                 {
-
-                    udpClient.Send(command, command.Length);
-                    device.SetOnline(false);
-
-                    if (DEBUG) System.Diagnostics.Trace.WriteLine("=> | " + BitConverter.ToString(command));
-
+                    System.Diagnostics.Trace.WriteLine("Send command but not online");
                 }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Trace.WriteLine(e.ToString());
-                device.SetOnline(false);
+                Device.SetOnline(false);
             }
         }
 
         private void Received(IAsyncResult res)
         {
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, device.Port);
+            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, Device.Port);
             byte[] received = udpClient.EndReceive(res, ref RemoteIpEndPoint);
 
-            if (DEBUG) System.Diagnostics.Trace.WriteLine("<= | " + PelcoDE.getDescriptionRequest(received[3]) + " | " + BitConverter.ToString(received) + "\n");
+            lastAnswerString = PelcoDE.getDescriptionRequest(received[3]);
+            if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("<= | " + PelcoDE.getDescriptionRequest(received[3]) + " | " + BitConverter.ToString(received));
 
-            device.parseRequest(received);
+            Device.parseRequest(received);
 
             udpClient.BeginReceive(new AsyncCallback(Received), null);
-
             System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                 new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
 
 
         }
+
+        public void SendCommandOld(byte[] command)
+        {
+            try
+            {
+                if (!Device.GetOnline())
+                {
+                    Connect();
+                    /*if (device.GetMaxStepPan() == 0 || device.GetMaxStepTilt() == 0 || device.GetMaxStepZoom() == 0 || device.GetMaxStepFocus() == 0)
+                    {
+                        SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
+                        Task.WaitAll(new Task[] { Task.Delay(500) });
+                    }*/
+                }
+
+                if (Device.GetOnline())
+                {
+
+                    udpClient.Send(command, command.Length);
+                    Device.SetOnline(false);
+
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("=> | " + BitConverter.ToString(command));
+
+                }
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+                Device.SetOnline(false);
+            }
+        }
     }
+
 }
