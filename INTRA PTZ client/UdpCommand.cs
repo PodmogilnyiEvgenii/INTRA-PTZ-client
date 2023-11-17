@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace INTRA_PTZ_client
+﻿namespace INTRA_PTZ_client
 {
     public class UdpCommand
     {

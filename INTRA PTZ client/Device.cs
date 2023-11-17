@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
-using System.Threading;
-using System.Timers;
-using System.Windows.Threading;
 
 
 namespace INTRA_PTZ_client
@@ -39,7 +35,7 @@ namespace INTRA_PTZ_client
         private readonly float minPan = 0;
         private readonly float maxPan = 359.99f;
         private readonly float minTilt = -90;
-        private readonly float maxTilt = 45;
+        private readonly float maxTilt = 90; //45
 
         public Device(MainWindow mainWindow)
         {
@@ -181,6 +177,8 @@ namespace INTRA_PTZ_client
 
                     case "Temperature": SetTemperature(request[4], request[5]); break;
 
+                    case "Register":                        break; 
+
                 }
             }
 
@@ -204,8 +202,8 @@ namespace INTRA_PTZ_client
         {
             try
             {
-                System.Diagnostics.Trace.WriteLine(angle);
-                System.Diagnostics.Trace.WriteLine(float.Parse(angle) * maxStepPan / (maxPan - minPan));
+                //System.Diagnostics.Trace.WriteLine(angle);
+                //System.Diagnostics.Trace.WriteLine(float.Parse(angle) * maxStepPan / (maxPan - minPan));
 
                 return (int)Math.Round(float.Parse(angle) * maxStepPan / (maxPan - minPan));
             }

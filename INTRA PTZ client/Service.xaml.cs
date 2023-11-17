@@ -42,25 +42,54 @@ namespace INTRA_PTZ_client
         }
 
         private void RequestSendButton1_Click(object sender, RoutedEventArgs e)
-        {           
-            mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x00, 0x01));   //0         
+        {
+            //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x00, 0x01));   //0
+
+            List<UdpCommand> list = new List<UdpCommand>();
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x06), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x09), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+
+            /*list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0D), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0E), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0F), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x12), "Register", AppOptions.UDP_TIMEOUT_SHORT));*/
+
+            mainWindow.Device.Udp.UdpServices.addTask(list);
+
         }
 
         private void RequestSendButton2_Click(object sender, RoutedEventArgs e)
         {
-            mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF4));   //90
+            List<UdpCommand> list = new List<UdpCommand>();
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+            //list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+
+            mainWindow.Device.Udp.UdpServices.addTask(list);
+
+            //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF4));   //90
         }
 
         private void RequestSendButton3_Click(object sender, RoutedEventArgs e)
         {
+            List<UdpCommand> list = new List<UdpCommand>();
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, 0x05), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x3F), "", AppOptions.UDP_TIMEOUT_SHORT));
+            //list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+
+            mainWindow.Device.Udp.UdpServices.addTask(list);
+
+
+
             //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x71, 0xE8));   //180
             //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTemperature"), 0x00, 0x00));
-
+            /*
             List<UdpCommand> list = new List<UdpCommand>();
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTemperature"), 0x00, 0x00), "Temperature", AppOptions.UDP_TIMEOUT_SHORT));
-            
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getVoltage"), 0x00, 0x00), "Voltage", AppOptions.UDP_TIMEOUT_SHORT));
             mainWindow.Device.Udp.UdpServices.addTask(list);           
-
+            */
 
 
             //System.Diagnostics.Trace.WriteLine(mainWindow.Device.ToString());

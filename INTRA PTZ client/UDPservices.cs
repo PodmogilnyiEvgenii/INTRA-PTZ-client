@@ -54,7 +54,7 @@ namespace INTRA_PTZ_client
             {
                 if (messageQueue.Count > 0)
                 {
-                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Start task (last " + (messageQueue.Count - 1) + ")");
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "Start task (last " + (messageQueue.Count - 1) + ")");
 
                     if (!device.GetOnline())
                     {

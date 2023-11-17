@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows.Threading;
 
 
@@ -18,7 +13,7 @@ namespace INTRA_PTZ_client
         private Device device;
         private UdpClient udpClient = new UdpClient();
         private UDPservices udpServices;
-        private string lastAnswerString="";
+        private string lastAnswerString = "";
 
         public Device Device { get => device; set => device = value; }
         public UDPservices UdpServices { get => udpServices; set => udpServices = value; }
@@ -28,8 +23,6 @@ namespace INTRA_PTZ_client
             this.mainWindow = mainWindow;
             this.device = device;
             this.udpServices = new UDPservices(device);
-
-            if (device == null) System.Diagnostics.Trace.WriteLine("device null");
         }
 
         public void Connect()
@@ -75,25 +68,41 @@ namespace INTRA_PTZ_client
                 if (Device.GetOnline())
                 {
                     lastAnswerString = "";
-                    udpClient.Send(udpCommand.Request, udpCommand.Request.Length);
-
-                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "=> | " + BitConverter.ToString(udpCommand.Request));
-
-                    DateTime start = DateTime.Now;
+                    int count = 0;
                     TimeSpan timeout;
 
                     do
                     {
-                        Task.WaitAll(new Task[] { Task.Delay(50) });
-                        timeout = DateTime.Now - start;
-                        //System.Diagnostics.Trace.WriteLine(timeout.TotalMilliseconds);
-                        //System.Diagnostics.Trace.WriteLine(udpCommand.Timeout);
+                        udpClient.Send(udpCommand.Request, udpCommand.Request.Length);
+                        DateTime start = DateTime.Now;
 
-                    } while (lastAnswerString != udpCommand.AnswerString && timeout.TotalMilliseconds < udpCommand.Timeout);
+                        if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "=> | " + BitConverter.ToString(udpCommand.Request));
+
+                        do
+                        {
+                            Task.WaitAll(new Task[] { Task.Delay(50) });
+                            timeout = DateTime.Now - start;
+
+                        } while (!lastAnswerString.Equals(udpCommand.AnswerString) && timeout.TotalMilliseconds < udpCommand.Timeout);
+
+                        count++;
+
+                        if (AppOptions.DEBUG)
+                        {
+                            if (lastAnswerString.Equals(udpCommand.AnswerString))
+                            {
+                                System.Diagnostics.Trace.WriteLine("Answer in " + timeout.TotalMilliseconds + " mc | count " + count);
+                            }
+                            else
+                            {
+                                System.Diagnostics.Trace.WriteLine("No answer in " + timeout.TotalMilliseconds + " mc | count " + count);
+                            }
+                        }
+
+                    } while (lastAnswerString != udpCommand.AnswerString && count < AppOptions.UDP_TRY_COMMAND_SEND);
 
                     if (timeout.TotalMilliseconds > udpCommand.Timeout) Device.SetOnline(false);
 
-                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Answer in " + timeout.TotalMilliseconds);
                 }
                 else
                 {
@@ -120,8 +129,6 @@ namespace INTRA_PTZ_client
             udpClient.BeginReceive(new AsyncCallback(Received), null);
             System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                 new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
-
-
         }
 
         public void SendCommandOld(byte[] command)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
@@ -128,9 +129,23 @@ namespace INTRA_PTZ_client
 
         private void SetCoordinatesButton_Click(object sender, RoutedEventArgs e)
         {
-            byte[] pan = BitConverter.GetBytes(Device.panAngleToStep(panField.Text));
+            if (!device.Udp.UdpServices.GetIsTimerOnline()) device.Udp.UdpServices.SetIsTimerOnline(true);
+            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
 
-            Device.Udp.SendCommandOld(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]));   //90
+            byte[] pan = BitConverter.GetBytes(Device.panAngleToStep(panField.Text));
+            byte[] tilt = BitConverter.GetBytes(Device.tiltAngleToStep(tiltField.Text));
+
+            //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
+            //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));          
+
+            List<UdpCommand> list = new List<UdpCommand>();
+            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+
+            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
+            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
+
+            Device.Udp.UdpServices.addTask(list);
         }
 
         private void Button7_Click(object sender, RoutedEventArgs e)

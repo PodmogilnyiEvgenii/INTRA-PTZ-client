@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace INTRA_PTZ_client
 {
@@ -22,7 +19,13 @@ namespace INTRA_PTZ_client
             descriptionCommands.Add("getFocus", 0x5B);
             descriptionCommands.Add("getMaxStepZoom", 0x5D);
             descriptionCommands.Add("getMaxStepFocus", 0x5F);
+
             descriptionCommands.Add("getTemperature", 0x91);
+            descriptionCommands.Add("getVoltage", 0x9B);
+
+            descriptionCommands.Add("getRegister", 0x9F);
+            descriptionCommands.Add("setRegister", 0x9D);
+
 
 
             //descriptionCommands.Add("getAllCoordinates", 0x79);
@@ -43,7 +46,11 @@ namespace INTRA_PTZ_client
             descriptionRequests.Add(0x6D, "MaxStepZoom");
             descriptionRequests.Add(0x6F, "MaxStepFocus");
             descriptionRequests.Add(0x7C, "Done");
+
             descriptionRequests.Add(0xA1, "Temperature");
+            descriptionRequests.Add(0xAB, "Voltage");
+
+            descriptionRequests.Add(0xAF, "Register");
         }
 
         public static byte getByteCommand(string command)
