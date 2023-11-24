@@ -38,7 +38,7 @@ namespace INTRA_PTZ_client
             Task.WaitAll(new Task[] { Task.Delay(500) });
             mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getMaxTilt"), 0x00, 0x00));
             */
-            mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("set"), 0x00, 0x00));            
+            //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("set"), 0x00, 0x00));            
         }
 
         private void RequestSendButton1_Click(object sender, RoutedEventArgs e)
@@ -55,7 +55,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x12), "Register", AppOptions.UDP_TIMEOUT_SHORT));*/
 
-            mainWindow.Device.Udp.UdpServices.addTask(list);
+            mainWindow.Device.Udp.UdpServices.addTaskToBegin(list);
 
         }
 
@@ -64,9 +64,10 @@ namespace INTRA_PTZ_client
             List<UdpCommand> list = new List<UdpCommand>();
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0xFE, 0x00), "", AppOptions.UDP_TIMEOUT_SHORT));
             //list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
 
-            mainWindow.Device.Udp.UdpServices.addTask(list);
+            mainWindow.Device.Udp.UdpServices.addTaskToBegin(list);
 
             //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF4));   //90
         }
@@ -76,9 +77,9 @@ namespace INTRA_PTZ_client
             List<UdpCommand> list = new List<UdpCommand>();
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, 0x05), "", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x3F), "", AppOptions.UDP_TIMEOUT_SHORT));
-            //list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0xFE, 0x00), "", AppOptions.UDP_TIMEOUT_SHORT));
 
-            mainWindow.Device.Udp.UdpServices.addTask(list);
+            mainWindow.Device.Udp.UdpServices.addTaskToBegin(list);
 
 
 
@@ -96,15 +97,13 @@ namespace INTRA_PTZ_client
         }
 
         private void GetAllCoordinats_Click(object sender, RoutedEventArgs e)
-        {
-            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
-            mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
+        {            
+            //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllCoordinates"), 0x00, 0x00));
         }
 
         private void GetAllMaxCoordinats_Click(object sender, RoutedEventArgs e)
-        {
-            //mainWindow.Device.Udp.SendCommand(PelcoDE.getCommand(mainWindow.Device.Addres, 0x00, PelcoDE.getByteCommand("getAllMaxCoordinates"), 0x00, 0x00));
-            mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
+        {            
+            //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
         }
 
 

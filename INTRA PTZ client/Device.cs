@@ -15,13 +15,13 @@ namespace INTRA_PTZ_client
         private int movingSpeed = 1;
 
         private bool isOnline = false;
-        private float currentPan = 0;
-        private float currentTilt = 0;
-        private float currentZoom = 0;
-        private float currentFocus = 0;
+        private double currentPan = 0;
+        private double currentTilt = 0;
+        private double currentZoom = 0;
+        private double currentFocus = 0;
 
-        private int currentStepPan = 0;
-        private int currentStepTilt = 0;
+        private int currentStepPan = -1;
+        private int currentStepTilt = -1;
         //private int currentStepZoom = 0;
         //private int currentStepFocus = 0;
 
@@ -51,9 +51,18 @@ namespace INTRA_PTZ_client
         public int Port { get => port; set => port = value; }
         public int Address { get => address; set => address = value; }
         public int MovingSpeed { get => movingSpeed; set => movingSpeed = value; }
+        public int CurrentStepPan { get => currentStepPan; set => currentStepPan = value; }
+        public int CurrentStepTilt { get => currentStepTilt; set => currentStepTilt = value; }
 
+        public float MinPan => minPan;
 
-        public float GetCurrentZoom()
+        public float MaxPan => maxPan;
+
+        public float MinTilt => minTilt;
+
+        public float MaxTilt => maxTilt;
+
+        public double GetCurrentZoom()
         {
             return currentZoom;
         }
@@ -64,7 +73,7 @@ namespace INTRA_PTZ_client
             currentZoom = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
-        public float GetCurrentFocus()
+        public double GetCurrentFocus()
         {
             return currentFocus;
         }
@@ -86,24 +95,26 @@ namespace INTRA_PTZ_client
             temperature = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
-        public float GetCurrentPan()
+        public double GetCurrentPan()
         {
             return currentPan;
         }
         public void SetCurrentPan(byte hh, byte ll)
         {
-            currentPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * maxPan / maxStepPan;
-            currentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentPan = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan -MinPan)/ maxStepPan,1);
+            CurrentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            //System.Diagnostics.Trace.WriteLine("set pan= " + CurrentStepPan);
         }
 
-        public float GetCurrentTilt()
+        public double GetCurrentTilt()
         {
             return currentTilt;
         }
         public void SetCurrentTilt(byte hh, byte ll)
         {
-            currentTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * maxTilt / maxStepTilt;
-            currentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentTilt = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt-MinTilt) / maxStepTilt,1);
+            CurrentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            //System.Diagnostics.Trace.WriteLine("set tilt= " + CurrentStepTilt);
         }
 
         public int GetMaxStepPan()
@@ -188,8 +199,8 @@ namespace INTRA_PTZ_client
         {
             String res = "Pan= " + currentPan + "\n";
             res += "Tilt= " + currentTilt + "\n";
-            res += "stepPan= " + currentStepPan + "\n";
-            res += "stepTilt= " + currentStepTilt + "\n";
+            res += "stepPan= " + CurrentStepPan + "\n";
+            res += "stepTilt= " + CurrentStepTilt + "\n";
             res += "MaxStepPan= " + maxStepPan + "\n";
             res += "MaxStepTilt= " + maxStepTilt + "\n";
             res += "Temperature= " + temperature + "\n";
@@ -205,7 +216,7 @@ namespace INTRA_PTZ_client
                 //System.Diagnostics.Trace.WriteLine(angle);
                 //System.Diagnostics.Trace.WriteLine(float.Parse(angle) * maxStepPan / (maxPan - minPan));
 
-                return (int)Math.Round(float.Parse(angle) * maxStepPan / (maxPan - minPan));
+                return (int)Math.Round(float.Parse(angle) * maxStepPan / (MaxPan - MinPan));
             }
             catch (Exception)
             {
@@ -217,7 +228,7 @@ namespace INTRA_PTZ_client
         {
             try
             {
-                return (int)Math.Round(float.Parse(angle) * maxStepTilt / (maxTilt - minTilt));
+                return (int)Math.Round(float.Parse(angle) * maxStepTilt / (MaxTilt - MinTilt));
             }
             catch (Exception)
             {

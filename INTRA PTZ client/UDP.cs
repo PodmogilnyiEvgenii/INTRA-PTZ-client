@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -57,7 +58,21 @@ namespace INTRA_PTZ_client
         {
             if (Device.GetMaxStepPan() == 0 || Device.GetMaxStepTilt() == 0 || Device.GetMaxStepZoom() == 0 || Device.GetMaxStepFocus() == 0)
             {
-                SendCommand(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00), "MaxStepFocus", 1000));
+
+                List<UdpCommand> list = new List<UdpCommand>();
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00), "MaxStepFocus", AppOptions.UDP_TIMEOUT_SHORT));
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+                
+                udpServices.addTaskToBegin(list);
+                //TODO
+                /*
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0D), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //слева
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0E), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //справа
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0F), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //снизу
+                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //сверху
+                */
+                
             }
         }
 
@@ -130,37 +145,7 @@ namespace INTRA_PTZ_client
             System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                 new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
         }
-
-        public void SendCommandOld(byte[] command)
-        {
-            try
-            {
-                if (!Device.GetOnline())
-                {
-                    Connect();
-                    /*if (device.GetMaxStepPan() == 0 || device.GetMaxStepTilt() == 0 || device.GetMaxStepZoom() == 0 || device.GetMaxStepFocus() == 0)
-                    {
-                        SendCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00));
-                        Task.WaitAll(new Task[] { Task.Delay(500) });
-                    }*/
-                }
-
-                if (Device.GetOnline())
-                {
-
-                    udpClient.Send(command, command.Length);
-                    Device.SetOnline(false);
-
-                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("=> | " + BitConverter.ToString(command));
-
-                }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Trace.WriteLine(e.ToString());
-                Device.SetOnline(false);
-            }
-        }
+        
     }
 
 }

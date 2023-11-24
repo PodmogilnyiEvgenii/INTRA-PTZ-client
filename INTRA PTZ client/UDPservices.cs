@@ -72,9 +72,28 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void addTask(List<UdpCommand> task)
+        public void addTaskToEnd(List<UdpCommand> task)
         {
             messageQueue.Enqueue(task);
+        }
+
+        public void addTaskToBegin(List<UdpCommand> task)
+        {
+            List<List<UdpCommand>> listOfTasks = new List<List<UdpCommand>>();
+
+            listOfTasks.Add(task);
+
+            while (messageQueue.Count > 0)
+            {
+                listOfTasks.Add(messageQueue.Dequeue());
+            }
+            
+
+            for (int i = 0; i < listOfTasks.Count; i++)
+            {
+                messageQueue.Enqueue(listOfTasks[i]);
+            }
+
         }
     }
 }

@@ -136,16 +136,31 @@ namespace INTRA_PTZ_client
             byte[] tilt = BitConverter.GetBytes(Device.tiltAngleToStep(tiltField.Text));
 
             //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
-            //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));          
+            //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
+
+
+            if (AppOptions.DEBUG && device.CurrentStepPan == Device.panAngleToStep(panField.Text) && device.CurrentStepTilt == Device.tiltAngleToStep(panField.Text))
+            {
+                System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " +
+                Device.panAngleToStep(panField.Text)
+                + " tilt= " +
+                Device.tiltAngleToStep(tiltField.Text)
+                );
+            }
 
             List<UdpCommand> list = new List<UdpCommand>();
-            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
-            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+            if (device.CurrentStepPan != Device.panAngleToStep(panField.Text)) list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+
+
+            if (device.CurrentStepTilt != Device.tiltAngleToStep(tiltField.Text)) list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
 
             //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
             //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
 
-            Device.Udp.UdpServices.addTask(list);
+            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+
+            Device.Udp.UdpServices.addTaskToBegin(list);
         }
 
         private void Button7_Click(object sender, RoutedEventArgs e)
