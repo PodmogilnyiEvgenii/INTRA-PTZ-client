@@ -5,21 +5,52 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
         mc:Ignorable="d"
-        Closing="RouteWindow_Closing"
+        
         x:Name="routeWindow" Title="Маршрут" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>            
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>            
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.Row="0" Height="40" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="0" Margin="10,0,10,0">
+            <Button x:Name="addRowButton" Content="Добавить" Margin="0,10,0,10" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="AddRowButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button x:Name="deleteRowButton" Content="Удалить" Margin="10,10,0,10" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="DeleteRowButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+        </DockPanel>
+        
+        <DockPanel Grid.Column="0" Grid.Row="1" Height="200" Margin="10,0,10,0">
+            <DataGrid x:Name="routeTable" Margin="5,5,5,5" MinHeight="170" SelectionMode="Single">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="tableMenuAddRowUp" Header="Добавить строку выше" Click="TableMenuAddRowUp_Click"/>
+                        <MenuItem x:Name="tableMenuAddRowDown" Header="Добавить строку ниже" Click="TableMenuAddRowDown_Click"/>
+                        <MenuItem x:Name="tableMenuDeleteRow" Header="Удалить строку" Click="TableMenuDeleteRow_Click"/>
+                        <MenuItem x:Name="tableMenuDeleteAll" Header="Удалить все" Click="TableMenuDeleteAll_Click"/>
+                        <MenuItem x:Name="tableMenuStartFromThisRow" Header="Запустить отсюда" Click="TableMenuStartFromThisRow_Click"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+            </DataGrid>
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="1" Height="45" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="2" Height="45" Margin="10,0,10,0">
             <Button x:Name="routeSaveButton" Content="Сохранить" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteSaveButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
@@ -28,7 +59,7 @@
                 </Button.Resources>
             </Button>
 
-            <Button x:Name="routeCancelButton" Content="Отмена" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteCancelButton_Click">
+            <Button x:Name="routeCancelButton" Content="Отмена" Margin="10,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteCancelButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -36,5 +67,12 @@
                 </Button.Resources>
             </Button>
         </DockPanel>
+
+        <StatusBar Grid.Column="0" Grid.Row="3" Margin="10,0,5,0" VerticalAlignment="Bottom">
+            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>
+            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
+                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
+            </TextBlock>
+        </StatusBar>
     </Grid>
 </Window>

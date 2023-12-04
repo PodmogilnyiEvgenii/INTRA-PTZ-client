@@ -26,9 +26,11 @@ namespace INTRA_PTZ_client
             descriptionCommands.Add("getRegister", 0x9F);
             descriptionCommands.Add("setRegister", 0x9D);
 
+            descriptionCommands.Add("makeTest", 0x93);
 
 
-            //descriptionCommands.Add("getAllCoordinates", 0x79);
+
+            //descriptionCommands.Add("getAllCoordinates", 0x79);   //после поворота шлет фигню
             descriptionCommands.Add("getAllMaxStepCoordinates", 0x7B);
 
             descriptionCommands.Add("setPan", 0x71);

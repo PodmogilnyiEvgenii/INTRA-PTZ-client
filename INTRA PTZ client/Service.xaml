@@ -5,8 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
         mc:Ignorable="d"
-        Closing="ServiceWindow_Closing"
-        Loaded="ServiceWindow_Loaded"
+        
         x:Name="serviceWindow" Title="Сервис" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
@@ -22,28 +21,75 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.Row="0" Height="30" Margin="10,0,10,0">                    
+        <DockPanel Grid.Column="0" Grid.Row="0"  Margin="10,10,10,10">
+            <StackPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,10" VerticalAlignment="Top" Text="Основные параметры:"/>
+                    <Button x:Name="getBasicOptionsButton" Content="Получить" Margin="0,7,0,0" Width="90" Height="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="getBasicOptionsButton_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,0,0,10" VerticalAlignment="Top" Text="Горизонталь:"/>
+                </DockPanel>                
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="50" Height="20" Margin="10,0,0,0" VerticalAlignment="Top" Text="Градусы:"/>                    
+                    <TextBox x:Name="minPanTextBox" Width="40" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                    <TextBlock Margin="10,0,0,5" VerticalAlignment="Top" Text="-"/>
+                    <TextBox x:Name="maxPanTextBox" Width="40" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                    <TextBlock HorizontalAlignment="Left" Width="50" Height="20" Margin="40,0,0,0" VerticalAlignment="Top" Text="Шаги:"/>
+                    <TextBox x:Name="maxPanStepTextBox" Width="60" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,10" VerticalAlignment="Top" Text="Вертикаль:"/>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="50" Height="20" Margin="10,0,0,0" VerticalAlignment="Top" Text="Градусы:"/>
+                    <TextBox x:Name="minTiltTextBox" Width="40" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                    <TextBlock Margin="10,0,0,5" VerticalAlignment="Top" Text="-"/>
+                    <TextBox x:Name="maxTiltTextBox" Width="40" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                    <TextBlock HorizontalAlignment="Left" Width="50" Height="20" Margin="40,0,0,0" VerticalAlignment="Top" Text="Шаги:"/>
+                    <TextBox x:Name="maxTiltStepTextBox" Width="60" Height="20" Margin="10,0,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" IsEnabled="False"/>
+                </DockPanel>
+            </StackPanel>
         </DockPanel>
         
-        <DockPanel Grid.Column="0" Grid.Row="1" Height="40" Margin="10,0,10,0">
-            <Button Content="Координаты" Margin="10,8,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" >
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="3"/>
-                    </Style>
-                </Button.Resources>
-            </Button>            
-            <Button Content="MAX" Margin="10,8,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" >
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="3"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
+        <DockPanel Grid.Column="0" Grid.Row="1"  Margin="10,0,10,0">
+            <StackPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="150" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Параметры перемещения:"/>
+                    <Button x:Name="setParametrs" Content="Установить" Margin="0,7,0,0" Width="90" Height="25" HorizontalAlignment="Right" VerticalAlignment="Top" Click="setParametrs_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="115" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Cкорость (1-63)"/>
+                    <TextBox x:Name="speedTextBox" Width="40" Height="20" Margin="10,10,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" PreviewTextInput="ValidationSpeedField"/>                    
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock HorizontalAlignment="Left" Width="115" Height="20" Margin="10,10,0,0" VerticalAlignment="Top" Text="Ускорение (0-5)"/>
+                    <TextBox x:Name="accelerationTextBox" Width="40" Height="20" Margin="10,10,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center" PreviewTextInput="ValidationAccelerationField"/>                    
+                </DockPanel>
+            </StackPanel>
         </DockPanel>
 
-        <DockPanel Grid.Column="1" Grid.Row="2" Height="45" Margin="10,0,10,0">            
-            <Button Content="1" Margin="10,8,0,0" Width="50" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RequestSendButton1_Click">
+        <DockPanel Grid.Column="1" Grid.Row="2" Height="20" Margin="10,0,10,0">            
+            
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="3" Height="20" Margin="10,0,10,0">            
+        </DockPanel>
+
+        <DockPanel Grid.Column="0" Grid.Row="4" Height="45" Margin="10,0,10,0" >
+            <Button Content="1" Margin="10,8,0,0" Width="50" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RequestSendButton1_Click" >
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -64,13 +110,6 @@
                     </Style>
                 </Button.Resources>
             </Button>
-        </DockPanel>
-
-        <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="10,0,10,0">
-            <TextBox x:Name="answerTextBox" Width="190" Height="20" Margin="2,10,0,0" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="Center"/>
-        </DockPanel>
-
-        <DockPanel Grid.Column="0" Grid.Row="4" Height="45" Margin="10,0,10,0">            
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="5" Height="45" Margin="10,0,10,0">

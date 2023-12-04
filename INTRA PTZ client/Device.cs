@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Collections.Generic;
+using System.Windows.Threading;
 
 namespace INTRA_PTZ_client
 {
@@ -7,21 +8,24 @@ namespace INTRA_PTZ_client
     {
         private MainWindow mainWindow;
         private UDP udp;
+        private Route route = new Route();
 
         private string ip = "10.130.250.197";
         private string mask = "255.255.255.0";
         private int port = 6000;
         private int address = 1;
-        private int movingSpeed = 1;
+        private int speed = -1;
+        private int acceleration = -1;
 
         private bool isOnline = false;
+        private int answertErrorCount = 0;
         private double currentPan = 0;
         private double currentTilt = 0;
         private double currentZoom = 0;
         private double currentFocus = 0;
 
-        private int currentStepPan = -1;
-        private int currentStepTilt = -1;
+        private int currentStepPan = 0;
+        private int currentStepTilt = 0;
         //private int currentStepZoom = 0;
         //private int currentStepFocus = 0;
 
@@ -33,9 +37,11 @@ namespace INTRA_PTZ_client
         private int temperature = 0;
 
         private readonly float minPan = 0;
-        private readonly float maxPan = 359.99f;
+        private readonly float maxPan = 360;
         private readonly float minTilt = -90;
         private readonly float maxTilt = 90; //45
+
+
 
         public Device(MainWindow mainWindow)
         {
@@ -45,12 +51,13 @@ namespace INTRA_PTZ_client
 
         public MainWindow MainWindow { get => mainWindow; set => mainWindow = value; }
         public UDP Udp { get => udp; set => udp = value; }
+        public Route Route { get => route; set => route = value; }
 
         public string Ip { get => ip; set => ip = value; }
         public string Mask { get => mask; set => mask = value; }
         public int Port { get => port; set => port = value; }
         public int Address { get => address; set => address = value; }
-        public int MovingSpeed { get => movingSpeed; set => movingSpeed = value; }
+
         public int CurrentStepPan { get => currentStepPan; set => currentStepPan = value; }
         public int CurrentStepTilt { get => currentStepTilt; set => currentStepTilt = value; }
 
@@ -61,6 +68,26 @@ namespace INTRA_PTZ_client
         public float MinTilt => minTilt;
 
         public float MaxTilt => maxTilt;
+
+        public int GetAnswertErrorCount()
+        {
+            return answertErrorCount;
+        }
+
+        public void AddAnswertErrorCount()
+        {
+            answertErrorCount++;
+            if (answertErrorCount >= AppOptions.ERROR_TO_OFFLINE)
+            {
+                udp.UdpServices.CoordinatesTimer.Stop();
+            }
+        }
+
+        public void ResetAnswertErrorCount()
+        {
+            answertErrorCount = 0;
+        }
+
 
         public double GetCurrentZoom()
         {
@@ -101,9 +128,9 @@ namespace INTRA_PTZ_client
         }
         public void SetCurrentPan(byte hh, byte ll)
         {
-            currentPan = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan -MinPan)/ maxStepPan,1);
+            currentPan = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan - MinPan) / maxStepPan, 1);
             CurrentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            //System.Diagnostics.Trace.WriteLine("set pan= " + CurrentStepPan);
+            //System.Diagnostics.Trace.WriteLine("set pan= " + CurrentStepPan);            
         }
 
         public double GetCurrentTilt()
@@ -112,9 +139,9 @@ namespace INTRA_PTZ_client
         }
         public void SetCurrentTilt(byte hh, byte ll)
         {
-            currentTilt = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt-MinTilt) / maxStepTilt,1);
+            currentTilt = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt - MinTilt) / maxStepTilt, 1);
             CurrentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            //System.Diagnostics.Trace.WriteLine("set tilt= " + CurrentStepTilt);
+            //System.Diagnostics.Trace.WriteLine("set tilt= " + CurrentStepTilt);            
         }
 
         public int GetMaxStepPan()
@@ -161,6 +188,8 @@ namespace INTRA_PTZ_client
         public void SetOnline(bool value)
         {
             isOnline = value;
+
+            if (value) udp.UdpServices.SetIsTimerOnline(true);
         }
 
 
@@ -174,6 +203,7 @@ namespace INTRA_PTZ_client
             if (request[1] == address)
             {
                 SetOnline(true);
+                ResetAnswertErrorCount();
                 switch (PelcoDE.getDescriptionRequest(request[3]))
                 {
                     case "Pan": SetCurrentPan(request[4], request[5]); break;
@@ -188,7 +218,7 @@ namespace INTRA_PTZ_client
 
                     case "Temperature": SetTemperature(request[4], request[5]); break;
 
-                    case "Register":                        break; 
+                    case "Register": break;
 
                 }
             }
@@ -235,5 +265,7 @@ namespace INTRA_PTZ_client
                 return -1;
             }
         }
+
+
     }
 }

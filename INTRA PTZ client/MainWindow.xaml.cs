@@ -30,10 +30,11 @@ namespace INTRA_PTZ_client
             focusField.IsEnabled = false;
 
             deviceDataText.Text = device.getStatusString();
-            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
+            
+            this.Closing += MainWindow_Closing;
 
             this.optionsWindow = new OptionsWindow(this);
-            this.routeWindow = new RouteWindow();
+            this.routeWindow = new RouteWindow(this);
             this.serviceWindow = new ServiceWindow(this);
             this.findWindow = new FindWindow();
 
@@ -46,11 +47,16 @@ namespace INTRA_PTZ_client
 
         private void RefreshTimer_Tick(object? sender, EventArgs e)
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
-                            deviceDataText.Text = device.getStatusString()));
+            String statusString = device.getStatusString();
 
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
-                            ServiceWindow.deviceDataText.Text = device.getStatusString()));
+                            deviceDataText.Text = statusString));
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            ServiceWindow.deviceDataText.Text = statusString));
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            routeWindow.deviceDataText.Text = statusString));
         }
 
         public OptionsWindow OptionsWindow { get => optionsWindow; set => optionsWindow = value; }
@@ -80,12 +86,7 @@ namespace INTRA_PTZ_client
         {
             //menu
             System.Windows.Application.Current.Shutdown();
-        }
-        private void isOnline_Click(object sender, RoutedEventArgs e)
-        {
-            device.Udp.UdpServices.SetIsTimerOnline(!device.Udp.UdpServices.GetIsTimerOnline());
-            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
-        }
+        }        
 
         //panel 1
 
@@ -129,8 +130,24 @@ namespace INTRA_PTZ_client
 
         private void SetCoordinatesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!device.Udp.UdpServices.GetIsTimerOnline()) device.Udp.UdpServices.SetIsTimerOnline(true);
-            isOnline.IsChecked = device.Udp.UdpServices.GetIsTimerOnline();
+            int panValue = -1;
+            int tiltValue = -1;
+
+            try
+            {
+                panValue = int.Parse(panField.Text);
+            }
+            catch { }
+
+            if (panValue > device.MaxPan || panValue < device.MinPan) panField.Text = device.GetCurrentPan().ToString();
+
+            try
+            {
+               tiltValue = int.Parse(tiltField.Text);
+            }
+            catch { }
+
+            if (tiltValue > device.MaxTilt || tiltValue < 0) tiltField.Text = device.GetCurrentTilt().ToString();
 
             byte[] pan = BitConverter.GetBytes(Device.panAngleToStep(panField.Text));
             byte[] tilt = BitConverter.GetBytes(Device.tiltAngleToStep(tiltField.Text));
@@ -149,73 +166,112 @@ namespace INTRA_PTZ_client
             }
 
             List<UdpCommand> list = new List<UdpCommand>();
-            if (device.CurrentStepPan != Device.panAngleToStep(panField.Text)) list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+            if (device.CurrentStepPan != Device.panAngleToStep(panField.Text))
+            {
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+            }
 
-
-            if (device.CurrentStepTilt != Device.tiltAngleToStep(tiltField.Text)) list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_SHORT));
+            if (device.CurrentStepTilt != Device.tiltAngleToStep(tiltField.Text))
+            {
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+            }
 
             //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
             //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
 
-            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
-            list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+            Device.Udp.UdpServices.addTaskToEnd(list);
+        }
 
-            Device.Udp.UdpServices.addTaskToBegin(list);
+        private void ManualControlUI(double speed, int dPan, int dTilt)
+        {
+            List<UdpCommand> list = new List<UdpCommand>();
+            if (dPan != 0)
+            {
+                int resultPan = Device.CurrentStepPan + dPan * AppOptions.SPEED_STEP_PAN[(int)speed];
+                if (resultPan < 0) resultPan += Device.GetMaxStepPan();
+                if (resultPan > Device.GetMaxStepPan()) resultPan -= Device.GetMaxStepPan();
+
+                byte[] pan = BitConverter.GetBytes(resultPan);
+
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+            }
+
+            if (dTilt != 0)
+            {
+                int resultTilt = Device.CurrentStepTilt + dTilt * AppOptions.SPEED_STEP_TILT[(int)speed];
+                if (resultTilt < 0) resultTilt += Device.GetMaxStepTilt();
+                if (resultTilt > Device.GetMaxStepTilt()) resultTilt -= Device.GetMaxStepTilt();
+
+                byte[] tilt = BitConverter.GetBytes(resultTilt);
+
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+            }
+            Device.Udp.UdpServices.addTaskToEnd(list);
         }
 
         private void Button7_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, -1, 1);
         }
 
         private void Button8_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, 0, 1);
         }
 
         private void Button9_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, 1, 1);
         }
 
         private void Button4_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, -1, 0);
         }
 
         private void Button5_Click(object sender, RoutedEventArgs e)
         {
-
+            if (device.CurrentStepPan != 0 && device.CurrentStepTilt != 0)
+            {
+                List<UdpCommand> list = new List<UdpCommand>();
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x00, 0x00), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), 0x00, 0x00), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("makeTest"), 0x00, 0x00), "Done", AppOptions.UDP_TIMEOUT_LONG));
+            }
         }
 
         private void Button6_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, 1, 0);
         }
 
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, -1, -1);
         }
 
         private void Button2_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, 0, -1);
         }
 
         private void Button3_Click(object sender, RoutedEventArgs e)
         {
-
+            ManualControlUI(speedSleder.Value, 1, -1);
         }
 
         private void SpeedPlusButton_Click(object sender, RoutedEventArgs e)
         {
-            if (speedSleder.Value < 8) speedSleder.Value = speedSleder.Value + 1;
+            if (speedSleder.Value < 7) speedSleder.Value = speedSleder.Value + 1;
         }
 
         private void SpeedMinusButton_Click(object sender, RoutedEventArgs e)
         {
-            if (speedSleder.Value > 1) speedSleder.Value = speedSleder.Value - 1;
+            if (speedSleder.Value > 0) speedSleder.Value = speedSleder.Value - 1;
         }
 
         private void ValidationPanField(object sender, TextCompositionEventArgs e)

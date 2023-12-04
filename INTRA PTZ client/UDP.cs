@@ -116,7 +116,11 @@ namespace INTRA_PTZ_client
 
                     } while (lastAnswerString != udpCommand.AnswerString && count < AppOptions.UDP_TRY_COMMAND_SEND);
 
-                    if (timeout.TotalMilliseconds > udpCommand.Timeout) Device.SetOnline(false);
+                    if (timeout.TotalMilliseconds > udpCommand.Timeout)
+                    {
+                        Device.SetOnline(false);
+                        device.AddAnswertErrorCount();
+                    }
 
                 }
                 else
@@ -142,8 +146,8 @@ namespace INTRA_PTZ_client
             Device.parseRequest(received);
 
             udpClient.BeginReceive(new AsyncCallback(Received), null);
-            System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
-                new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));
+            /*System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
+                new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));*/
         }
         
     }
