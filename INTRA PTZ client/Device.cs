@@ -1,47 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Windows.Threading;
 
 namespace INTRA_PTZ_client
 {
+    [Serializable]
     public class Device
     {
-        private MainWindow mainWindow;
-        private UDP udp;
+        [NonSerialized] private MainWindow mainWindow;
+        [NonSerialized] private UDP udp;
         private Route route = new Route();
+        private Preset preset = new Preset();
 
         private string ip = "10.130.250.197";
         private string mask = "255.255.255.0";
         private int port = 6000;
         private int address = 1;
-        private int speed = -1;
-        private int acceleration = -1;
+        //private int speed = -1;
+        //private int acceleration = -1;
 
-        private bool isOnline = false;
-        private int answertErrorCount = 0;
-        private double currentPan = 0;
-        private double currentTilt = 0;
-        private double currentZoom = 0;
-        private double currentFocus = 0;
+        [NonSerialized] private bool isOnline = false;
+        [NonSerialized] private int answertErrorCount = 0;
+        [NonSerialized] private float currentPan = 0;
+        [NonSerialized] private float currentTilt = 0;
+        [NonSerialized] private float currentZoom = 0;
+        [NonSerialized] private float currentFocus = 0;
 
-        private int currentStepPan = 0;
-        private int currentStepTilt = 0;
+        [NonSerialized] private int currentStepPan = 0;
+        [NonSerialized] private int currentStepTilt = 0;
         //private int currentStepZoom = 0;
         //private int currentStepFocus = 0;
 
-        private int maxStepPan = 0;
-        private int maxStepTilt = 0;
-        private int maxStepZoom = 0;
-        private int maxStepFocus = 0;
+        [NonSerialized] private int maxStepPan = 0;
+        [NonSerialized] private int maxStepTilt = 0;
+        [NonSerialized] private int maxStepZoom = 0;
+        [NonSerialized] private int maxStepFocus = 0;
 
-        private int temperature = 0;
+        [NonSerialized] private int temperature = 0;
 
-        private readonly float minPan = 0;
-        private readonly float maxPan = 360;
-        private readonly float minTilt = -90;
-        private readonly float maxTilt = 90; //45
-
-
+        [NonSerialized] private readonly float minPan = 0;
+        [NonSerialized] private readonly float maxPan = 360;
+        [NonSerialized] private readonly float minTilt = -90;
+        [NonSerialized] private readonly float maxTilt = 90; //45
 
         public Device(MainWindow mainWindow)
         {
@@ -52,6 +50,7 @@ namespace INTRA_PTZ_client
         public MainWindow MainWindow { get => mainWindow; set => mainWindow = value; }
         public UDP Udp { get => udp; set => udp = value; }
         public Route Route { get => route; set => route = value; }
+        public Preset Preset { get => preset; set => preset = value; }
 
         public string Ip { get => ip; set => ip = value; }
         public string Mask { get => mask; set => mask = value; }
@@ -73,7 +72,6 @@ namespace INTRA_PTZ_client
         {
             return answertErrorCount;
         }
-
         public void AddAnswertErrorCount()
         {
             answertErrorCount++;
@@ -82,29 +80,25 @@ namespace INTRA_PTZ_client
                 udp.UdpServices.CoordinatesTimer.Stop();
             }
         }
-
         public void ResetAnswertErrorCount()
         {
             answertErrorCount = 0;
         }
 
-
-        public double GetCurrentZoom()
+        public float GetCurrentZoom()
         {
             return currentZoom;
         }
-
         public void SetCurrentZoom(byte hh, byte ll)
         {
             //TODO
             currentZoom = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
-        public double GetCurrentFocus()
+        public float GetCurrentFocus()
         {
             return currentFocus;
         }
-
         public void SetCurrentFocus(byte hh, byte ll)
         {
             //TODO
@@ -122,25 +116,31 @@ namespace INTRA_PTZ_client
             temperature = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
         }
 
-        public double GetCurrentPan()
+        public float GetCurrentPan()
         {
             return currentPan;
         }
         public void SetCurrentPan(byte hh, byte ll)
         {
-            currentPan = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan - MinPan) / maxStepPan, 1);
-            CurrentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentPan = (float)panStepToAngle(currentStepPan);
+
+            //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan - MinPan) / maxStepPan, 1);
+
             //System.Diagnostics.Trace.WriteLine("set pan= " + CurrentStepPan);            
         }
 
-        public double GetCurrentTilt()
+        public float GetCurrentTilt()
         {
             return currentTilt;
         }
         public void SetCurrentTilt(byte hh, byte ll)
         {
-            currentTilt = Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt - MinTilt) / maxStepTilt, 1);
-            CurrentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
+            currentTilt = (float)tiltStepToAngle(currentStepTilt);
+
+            //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt - MinTilt) / maxStepTilt, 1);
+
             //System.Diagnostics.Trace.WriteLine("set tilt= " + CurrentStepTilt);            
         }
 
@@ -243,29 +243,34 @@ namespace INTRA_PTZ_client
         {
             try
             {
-                //System.Diagnostics.Trace.WriteLine(angle);
-                //System.Diagnostics.Trace.WriteLine(float.Parse(angle) * maxStepPan / (maxPan - minPan));
-
-                return (int)Math.Round(float.Parse(angle) * maxStepPan / (MaxPan - MinPan));
+                return (int)Math.Round((float.Parse(angle) - minPan) * maxStepPan / (maxPan - minPan));
             }
             catch (Exception)
             {
                 return -1;
             }
+        }
+
+        public float panStepToAngle(int currentStepPan)
+        {
+            return currentStepPan / maxStepPan * (maxPan - minPan) + minPan;
         }
 
         public int tiltAngleToStep(string angle)
         {
             try
             {
-                return (int)Math.Round(float.Parse(angle) * maxStepTilt / (MaxTilt - MinTilt));
+                return (int)Math.Round((float.Parse(angle) - MinTilt) * maxStepTilt / (MaxTilt - MinTilt));
             }
             catch (Exception)
             {
                 return -1;
             }
         }
-
+        public float tiltStepToAngle(int currentStepTilt)
+        {
+            return currentStepTilt / maxStepTilt * (maxTilt - minTilt) + minTilt;
+        }
 
     }
 }

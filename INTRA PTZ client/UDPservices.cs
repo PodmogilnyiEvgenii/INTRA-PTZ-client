@@ -74,25 +74,36 @@ namespace INTRA_PTZ_client
 
         public void addTaskToEnd(List<UdpCommand> task)
         {
-            messageQueue.Enqueue(task);
+            if (messageQueue.Count < 5) { messageQueue.Enqueue(task); }
+            else
+            {
+                if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Too many tasks");
+            }
         }
 
         public void addTaskToBegin(List<UdpCommand> task)
         {
-            List<List<UdpCommand>> listOfTasks = new List<List<UdpCommand>>();
-
-            listOfTasks.Add(task);
-
-            while (messageQueue.Count > 0)
+            if (messageQueue.Count < 5)
             {
-                listOfTasks.Add(messageQueue.Dequeue());
-            }
-            
+                List<List<UdpCommand>> listOfTasks = new List<List<UdpCommand>>();
+                listOfTasks.Add(task);
 
-            for (int i = 0; i < listOfTasks.Count; i++)
-            {
-                messageQueue.Enqueue(listOfTasks[i]);
+                while (messageQueue.Count > 0)
+                {
+                    listOfTasks.Add(messageQueue.Dequeue());
+                }
+
+                for (int i = 0; i < listOfTasks.Count; i++)
+                {
+                    messageQueue.Enqueue(listOfTasks[i]);
+                }
             }
+            else
+            {
+                if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Too many tasks");
+            }
+
+
 
         }
     }

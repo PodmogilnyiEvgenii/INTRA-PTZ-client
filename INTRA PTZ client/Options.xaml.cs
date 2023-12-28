@@ -21,7 +21,7 @@ namespace INTRA_PTZ_client
 
         private void OptionsWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
+            
         }
         private void OptionsWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -43,16 +43,21 @@ namespace INTRA_PTZ_client
             mask4.Text = ip[3];
 
             port.Text = mainWindow.Device.Port.ToString();
-            address.Text = mainWindow.Device.Address.ToString();
+            address.Text = mainWindow.Device.Address.ToString();            
         }
 
         private void OptionsSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            optionsWindow.Visibility = Visibility.Hidden;
             mainWindow.Device.Ip = ip1.Text + "." + ip2.Text + "." + ip3.Text + "." + ip4.Text;
             mainWindow.Device.Mask = mask1.Text + "." + mask2.Text + "." + mask3.Text + "." + mask4.Text;
             mainWindow.Device.Port = int.Parse(port.Text);
             mainWindow.Device.Address = int.Parse(address.Text);
+
+            mainWindow.Device.Udp.getFirstData();
+
+            optionsWindow.Visibility = Visibility.Hidden;
+
+            
         }
         private void OptionsCancelButton_Click(object sender, RoutedEventArgs e)
         {

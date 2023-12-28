@@ -32,6 +32,14 @@
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="1" >
+            <Button x:Name="presetButton" Content="Пресеты" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PresetButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+            
             <Button x:Name="routeButton" Content="Маршрут" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
@@ -49,14 +57,6 @@
             </Button>
 
             <Button x:Name="configButton" Content="Настройки" Margin="10,10,0,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="ConfigButton_Click">
-                <Button.Resources>
-                    <Style TargetType="Border">
-                        <Setter Property="CornerRadius" Value="3"/>
-                    </Style>
-                </Button.Resources>
-            </Button>
-
-            <Button x:Name="findButton" Content="Поиск" Margin="10,10,10,10" Width="80" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="FindButton_Click" IsEnabled="False">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -230,11 +230,85 @@
                     </Button>
                 </DockPanel>
             </StackPanel>
-
-
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="4" Height="15" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="4">
+            <StackPanel>
+                <TextBlock HorizontalAlignment="Left" Height="20" Margin="10,10,0,5" VerticalAlignment="Top" Text="Пресеты:" FontWeight="Bold"/>
+                <DockPanel>
+                    <Button x:Name="preset1" Content="1" Margin="6,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset1_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>                       
+                    </Button>
+                    <Button x:Name="preset2" Content="2" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset2_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset3" Content="3" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset3_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset4" Content="4" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset4_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset5" Content="5" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset5_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset6" Content="6" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset6_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset7" Content="7" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset7_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset8" Content="8" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset8_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset9" Content="9" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset9_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    <Button x:Name="preset10" Content="10" Margin="3,5,3,5" Width="30" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Preset10_Click">
+                        <Button.Resources>
+                            <Style TargetType="{x:Type Border}">
+                                <Setter Property="CornerRadius" Value="3"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                    
+                </DockPanel>
+            </StackPanel>
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="5" Height="15" Margin="10,0,10,0">

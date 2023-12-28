@@ -155,13 +155,13 @@ namespace INTRA_PTZ_client
 
             if (accelerationValue > 5 || accelerationValue < 0) accelerationTextBox.Text = "1";
 
-            byte[] speed = BitConverter.GetBytes(int.Parse(speedTextBox.Text));
-            byte[] acceleration = BitConverter.GetBytes(int.Parse(accelerationTextBox.Text));
+            //byte[] speed = BitConverter.GetBytes(int.Parse(speedTextBox.Text));
+            //byte[] acceleration = BitConverter.GetBytes(int.Parse(accelerationTextBox.Text));
 
 
             List<UdpCommand> list = new List<UdpCommand>();
-            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, speed[0]), "", AppOptions.UDP_TIMEOUT_SHORT));
-            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, acceleration[0]), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, /*speed[0]*/(byte) speedValue), "", AppOptions.UDP_TIMEOUT_SHORT));
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x06, /*acceleration[0]*/(byte) accelerationValue), "", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0xFE, 0x00), "", AppOptions.UDP_TIMEOUT_SHORT));
 
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x09), "Register", AppOptions.UDP_TIMEOUT_SHORT));
