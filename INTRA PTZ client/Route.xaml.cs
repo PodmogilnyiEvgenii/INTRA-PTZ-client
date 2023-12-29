@@ -147,7 +147,7 @@ namespace INTRA_PTZ_client
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
-                    //cell.Foreground = Brushes.Black;
+                    cell.Foreground = Brushes.Black;
                     break;
 
                 case 1:     //Координаты
@@ -156,11 +156,11 @@ namespace INTRA_PTZ_client
 
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
-                    //cell.Foreground = Brushes.Black;
+                    cell.Foreground = Brushes.Black;
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
-                    //cell.Foreground = Brushes.Black;
+                    cell.Foreground = Brushes.Black;
                     break;
 
                 case 2:     //Пресет
@@ -169,11 +169,11 @@ namespace INTRA_PTZ_client
 
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
-                    //cell.Foreground = Brushes.Black;
+                    cell.Foreground = Brushes.Black;
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
-                    //cell.Foreground = Brushes.Black;
+                    cell.Foreground = Brushes.Black;
                     break;
             }  
         }

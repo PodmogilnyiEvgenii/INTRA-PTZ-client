@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using System.Windows.Threading;
+using static INTRA_PTZ_client.Route;
+using static INTRA_PTZ_client.Preset;
 
 namespace INTRA_PTZ_client
 {
@@ -44,11 +46,23 @@ namespace INTRA_PTZ_client
             refreshTimer.Interval = TimeSpan.FromMilliseconds(1000);
             refreshTimer.Start();
 
-            //Device.Udp.getFirstData();
+            //Device.Udp.getFirstData();            
+
+            List<Route.RouteTableRow> routeList = new List<Route.RouteTableRow>();
+            routeList.Add(new RouteTableRow(1, 0, 0, 0, 60));
+            routeList.Add(new RouteTableRow(2, 1, 0, 0, 60));
+            routeList.Add(new RouteTableRow(3, 2, 0, 0, 60));
+            routeList.Add(new RouteTableRow(4, 0, 0, 0, 60));
+            Device.Route.SetRouteList(routeList);
+
+            List<Preset.PresetTableRow> presetList = new List<Preset.PresetTableRow>();
+            for (int i = 1; i <= 20; i++)
+            {
+                presetList.Add(new PresetTableRow(i, 0, 0));
+            }
+            Device.Preset.SetPresetList(presetList);
 
             updateTooltips();
-
-
         }
 
         private void RefreshTimer_Tick(object? sender, EventArgs e)
@@ -81,6 +95,34 @@ namespace INTRA_PTZ_client
         private void ConfigurationLoad_Click(object sender, RoutedEventArgs e)
         {
             //menu
+
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "ECI cfg files (*.cfg)|*.cfg";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string fileName = openFileDialog.FileName;
+
+                using (TextReader textReader = new StreamReader(fileName))
+                {
+                    try
+                    {
+                        Device device = JsonConvert.DeserializeObject<Device>(textReader.ReadToEnd());
+                        device.MainWindow = this;
+                        device.Udp=new UDP(this,device);
+                        this.device = device;
+                        //MessageBox.Show("Конфигурация загружена!");
+                    }
+                    catch (IOException ex)
+                    {
+                        System.Diagnostics.Trace.WriteLine("Configuration load failed: " + ex.Message);
+                    }
+                }
+            }
+
+
+
+
         }
         private void ConfigurationSave_Click(object sender, RoutedEventArgs e)
         {
@@ -98,8 +140,8 @@ namespace INTRA_PTZ_client
                     try
                     {
                         textWriter.Write(data);
-                        MessageBox.Show("Конфигурация сохранена!");
-                        
+                        //MessageBox.Show("Конфигурация сохранена!");
+
 
                     }
                     catch (IOException ex)
@@ -112,10 +154,11 @@ namespace INTRA_PTZ_client
 
 
         }
-        private void Exit_Click(object sender, RoutedEventArgs e)
+        private void About_Click(object sender, RoutedEventArgs e)
         {
             //menu
-            System.Windows.Application.Current.Shutdown();
+            MessageBox.Show("Здесь могла бы быть ваша реклама!");
+            //System.Windows.Application.Current.Shutdown();
         }
 
         //panel 1
@@ -398,7 +441,7 @@ namespace INTRA_PTZ_client
                 ToolTip toolTip = new ToolTip();
                 toolTip.Content = Device.Preset.getTooltipDesc(i);
                 list[i].ToolTip = toolTip;
-            }            
+            }
         }
 
 

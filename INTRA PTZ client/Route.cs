@@ -6,6 +6,7 @@ namespace INTRA_PTZ_client
     [Serializable]
     public class Route
     {
+        [Serializable]
         public class RouteTableRow
         {
             public enum OperationTypeEnum
@@ -53,6 +54,8 @@ namespace INTRA_PTZ_client
         private List<RouteTableRow> routeList = new List<RouteTableRow>();
         [NonSerialized] private bool isStart = false;
 
+        public List<RouteTableRow> RouteList { get => routeList; set => routeList = value; }
+
         public bool GetIsStart()
         {
             return isStart;
@@ -64,64 +67,63 @@ namespace INTRA_PTZ_client
 
         public List<RouteTableRow> GetRouteList()
         {
-            return routeList;
+            return RouteList;
         }
         public void SetRouteList(List<RouteTableRow> routeList)
         {
-            this.routeList = routeList;
+            this.RouteList = routeList;
         }
 
         public Route()
-        {
-            routeList.Add(new RouteTableRow(1, 0, 0, 0, 60));
-            routeList.Add(new RouteTableRow(2, 1, 0, 0, 60));
-            routeList.Add(new RouteTableRow(3, 2, 0, 0, 60));
-            routeList.Add(new RouteTableRow(4, 0, 0, 0, 60));
-
+        {/*
+            if (RouteList.Count == 0)
+            {
+                RouteList.Add(new RouteTableRow(1, 0, 0, 0, 60));
+                RouteList.Add(new RouteTableRow(2, 1, 0, 0, 60));
+                RouteList.Add(new RouteTableRow(3, 2, 0, 0, 60));
+                RouteList.Add(new RouteTableRow(4, 0, 0, 0, 60));
+            }
+            */
         }
 
-        public void addrouteListUp(int rowNumber)           
+        public void addrouteListUp(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
                 if (i == rowNumber) newRouteList.Add(new RouteTableRow(i, 2, 0, 0, 0));
-                newRouteList.Add(routeList[i]);
+                newRouteList.Add(RouteList[i]);
             }
-            if (routeList.Count == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
+            if (RouteList.Count == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
 
             SetRouteList(setRightOrder(newRouteList));
         }
-
-        public void addrouteListDown(int rowNumber)         
+        public void addrouteListDown(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
                 if (i == rowNumber + 1) newRouteList.Add(new RouteTableRow(i, 2, 0, 0, 0));
-                newRouteList.Add(routeList[i]);
+                newRouteList.Add(RouteList[i]);
             }
-            if (routeList.Count == rowNumber || routeList.Count - 1 == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
+            if (RouteList.Count == rowNumber || RouteList.Count - 1 == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
 
             SetRouteList(setRightOrder(newRouteList));
         }
-
         public void routeListDeleteRow(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
-                if (i != rowNumber) newRouteList.Add(routeList[i]);
+                if (i != rowNumber) newRouteList.Add(RouteList[i]);
             }
 
             SetRouteList(setRightOrder(newRouteList));
         }
-
         public void routeListDeleteAll()
         {
             SetRouteList(new List<RouteTableRow>());
         }
-
         private List<RouteTableRow> setRightOrder(List<RouteTableRow> list)
         {
             for (int i = 0; i < list.Count; i++)
@@ -131,10 +133,9 @@ namespace INTRA_PTZ_client
 
             return list;
         }
-
         public void setRouteTypeByIndex(int index, int type)
         {
-            routeList[index].OperationType = type;
+            RouteList[index].OperationType = type;
         }
 
     }

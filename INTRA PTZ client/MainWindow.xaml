@@ -23,11 +23,12 @@
 
         <DockPanel Grid.Column="0" Grid.Row="0" Height="20" Margin="10,0,10,0">
             <Menu>
-                <MenuItem x:Name="configMenu" Header="Файл" Height="20">
-                    <MenuItem x:Name="configMenuOpen" Header="Открыть.." Click="ConfigurationLoad_Click"/>
-                    <MenuItem x:Name="configMenuSave" Header="Сохранить.." Click="ConfigurationSave_Click"/>
-                    <MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>
-                </MenuItem>
+                <!--<MenuItem x:Name="configMenu" Header="Файл" Height="20">-->
+                    <MenuItem x:Name="configMenuOpen" Header="Открыть cfg" Click="ConfigurationLoad_Click"/>
+                    <MenuItem x:Name="configMenuSave" Header="Сохранить cfg" Click="ConfigurationSave_Click"/>
+                    <MenuItem Header="О программе" Click="About_Click"/>
+                    <!--<MenuItem x:Name="configMenuExit" Header="Выход" Click="Exit_Click"/>-->
+                <!--</MenuItem>-->
             </Menu>
         </DockPanel>
 

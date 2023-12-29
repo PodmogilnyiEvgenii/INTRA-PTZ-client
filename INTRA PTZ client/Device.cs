@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace INTRA_PTZ_client
 {
     [Serializable]
     public class Device
     {
-        [NonSerialized] private MainWindow mainWindow;
-        [NonSerialized] private UDP udp;
-        private Route route = new Route();
-        private Preset preset = new Preset();
+        [JsonIgnore] private MainWindow mainWindow;
+        [JsonIgnore] private UDP udp;
+        private Route route;
+        private Preset preset;
 
         private string ip = "10.130.250.197";
         private string mask = "255.255.255.0";
@@ -17,38 +18,40 @@ namespace INTRA_PTZ_client
         //private int speed = -1;
         //private int acceleration = -1;
 
-        [NonSerialized] private bool isOnline = false;
-        [NonSerialized] private int answertErrorCount = 0;
-        [NonSerialized] private float currentPan = 0;
-        [NonSerialized] private float currentTilt = 0;
-        [NonSerialized] private float currentZoom = 0;
-        [NonSerialized] private float currentFocus = 0;
+        [JsonIgnore] private bool isOnline = false;
+        [JsonIgnore] private int answertErrorCount = 0;
+        [JsonIgnore] private float currentPan = 0;
+        [JsonIgnore] private float currentTilt = 0;
+        [JsonIgnore] private float currentZoom = 0;
+        [JsonIgnore] private float currentFocus = 0;
 
-        [NonSerialized] private int currentStepPan = 0;
-        [NonSerialized] private int currentStepTilt = 0;
+        [JsonIgnore] private int currentStepPan = 0;
+        [JsonIgnore] private int currentStepTilt = 0;
         //private int currentStepZoom = 0;
         //private int currentStepFocus = 0;
 
-        [NonSerialized] private int maxStepPan = 0;
-        [NonSerialized] private int maxStepTilt = 0;
-        [NonSerialized] private int maxStepZoom = 0;
-        [NonSerialized] private int maxStepFocus = 0;
+        [JsonIgnore] private int maxStepPan = 0;
+        [JsonIgnore] private int maxStepTilt = 0;
+        [JsonIgnore] private int maxStepZoom = 0;
+        [JsonIgnore] private int maxStepFocus = 0;
 
-        [NonSerialized] private int temperature = 0;
+        [JsonIgnore] private int temperature = 0;
 
-        [NonSerialized] private readonly float minPan = 0;
-        [NonSerialized] private readonly float maxPan = 360;
-        [NonSerialized] private readonly float minTilt = -90;
-        [NonSerialized] private readonly float maxTilt = 90; //45
+        [JsonIgnore] private readonly float minPan = 0;
+        [JsonIgnore] private readonly float maxPan = 360;
+        [JsonIgnore] private readonly float minTilt = -90;
+        [JsonIgnore] private readonly float maxTilt = 90; //45
 
         public Device(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
             this.udp = new UDP(mainWindow, this);
+            if (route == null) this.route = new Route();
+            if (preset == null) this.preset = new Preset();
         }
 
-        public MainWindow MainWindow { get => mainWindow; set => mainWindow = value; }
-        public UDP Udp { get => udp; set => udp = value; }
+        [JsonIgnore] public MainWindow MainWindow { get => mainWindow; set => mainWindow = value; }
+        [JsonIgnore] public UDP Udp { get => udp; set => udp = value; }
         public Route Route { get => route; set => route = value; }
         public Preset Preset { get => preset; set => preset = value; }
 
@@ -57,16 +60,16 @@ namespace INTRA_PTZ_client
         public int Port { get => port; set => port = value; }
         public int Address { get => address; set => address = value; }
 
-        public int CurrentStepPan { get => currentStepPan; set => currentStepPan = value; }
-        public int CurrentStepTilt { get => currentStepTilt; set => currentStepTilt = value; }
+        [JsonIgnore] public int CurrentStepPan { get => currentStepPan; set => currentStepPan = value; }
+        [JsonIgnore] public int CurrentStepTilt { get => currentStepTilt; set => currentStepTilt = value; }
 
-        public float MinPan => minPan;
+        [JsonIgnore] public float MinPan => minPan;
 
-        public float MaxPan => maxPan;
+        [JsonIgnore] public float MaxPan => maxPan;
 
-        public float MinTilt => minTilt;
+        [JsonIgnore] public float MinTilt => minTilt;
 
-        public float MaxTilt => maxTilt;
+        [JsonIgnore] public float MaxTilt => maxTilt;
 
         public int GetAnswertErrorCount()
         {

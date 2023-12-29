@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static INTRA_PTZ_client.Route;
 
 namespace INTRA_PTZ_client
 {
     [Serializable]
     public class Preset
     {
+        [Serializable]
         public class PresetTableRow
         {
             private int count = 0;
@@ -36,44 +33,50 @@ namespace INTRA_PTZ_client
 
         private List<PresetTableRow> presetList = new List<PresetTableRow>();
 
+        public List<PresetTableRow> PresetList { get => presetList; set => presetList = value; }
+
         public List<PresetTableRow> GetPresetList()
         {
-            return presetList;
+            return PresetList;
         }
         public void SetPresetList(List<PresetTableRow> presetList)
         {
-            this.presetList = presetList;
+            this.PresetList = presetList;
         }
 
         public Preset()
-        {
-            for (int i = 1; i <= 20; i++)
+        {/*
+            if (PresetList.Count == 0)
             {
-                presetList.Add(new PresetTableRow(i, 0, 0));
+                for (int i = 1; i <= 20; i++)
+                {
+                    PresetList.Add(new PresetTableRow(i, 0, 0));
+                }
             }
+            */
         }
 
         public void AddRow()
         {
             //TODO
             List<PresetTableRow> newPresetList = new List<PresetTableRow>();
-            for (int i = 0; i < presetList.Count; i++)
+            for (int i = 0; i < PresetList.Count; i++)
             {
-                newPresetList.Add(presetList[i]);
+                newPresetList.Add(PresetList[i]);
             }
-            newPresetList.Add(new PresetTableRow(presetList.Count + 1, 0, 0));
+            newPresetList.Add(new PresetTableRow(PresetList.Count + 1, 0, 0));
             SetPresetList(newPresetList);
         }
 
         public void DeleteRow()
         {
             //TODO
-            if (presetList.Count > 0)
+            if (PresetList.Count > 0)
             {
                 List<PresetTableRow> newPresetList = new List<PresetTableRow>();
-                for (int i = 0; i < presetList.Count - 1; i++)
+                for (int i = 0; i < PresetList.Count - 1; i++)
                 {
-                    newPresetList.Add(presetList[i]);
+                    newPresetList.Add(PresetList[i]);
                 }
                 SetPresetList(newPresetList);
             }
@@ -81,13 +84,13 @@ namespace INTRA_PTZ_client
 
         public String getTooltipDesc(int num)
         {
-            if (num > presetList.Count - 1)
+            if (num > PresetList.Count - 1)
             {
                 return ",";
             }
             else
             {
-                return presetList[num].Pan + ", " + presetList[num].Tilt;
+                return PresetList[num].Pan + ", " + PresetList[num].Tilt;
             }
         }
     }
