@@ -58,7 +58,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x12), "Register", AppOptions.UDP_TIMEOUT_SHORT));*/
 
-            mainWindow.Device.Udp.UdpServices.addTaskToEnd(list);
+            mainWindow.Device.Udp.UdpServices.AddTaskToEnd(list);
 
         }
 
@@ -70,7 +70,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0xFE, 0x00), "", AppOptions.UDP_TIMEOUT_SHORT));
             //list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x01), "", AppOptions.UDP_TIMEOUT_SHORT));
 
-            mainWindow.Device.Udp.UdpServices.addTaskToEnd(list);
+            mainWindow.Device.Udp.UdpServices.AddTaskToEnd(list);
 
             //mainWindow.Device.Udp.SendCommandOld(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), 0x38, 0xF4));   //90
         }
@@ -82,7 +82,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0x09, 0x3F), "", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("setRegister"), 0xFE, 0x00), "", AppOptions.UDP_TIMEOUT_SHORT));
 
-            mainWindow.Device.Udp.UdpServices.addTaskToEnd(list);
+            mainWindow.Device.Udp.UdpServices.AddTaskToEnd(list);
 
 
 
@@ -121,7 +121,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0F), "Register", AppOptions.UDP_TIMEOUT_SHORT));
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT));
 
-            mainWindow.Device.Udp.UdpServices.addTaskToEnd(list);
+            mainWindow.Device.Udp.UdpServices.AddTaskToEnd(list);
 
             Task.WaitAll(new Task[] { Task.Delay(1500) });
 
@@ -168,7 +168,7 @@ namespace INTRA_PTZ_client
             list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x06), "Register", AppOptions.UDP_TIMEOUT_SHORT));
 
 
-            mainWindow.Device.Udp.UdpServices.addTaskToEnd(list);
+            mainWindow.Device.Udp.UdpServices.AddTaskToEnd(list);
         }
 
         private void ValidationSpeedField(object sender, TextCompositionEventArgs e)

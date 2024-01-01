@@ -26,21 +26,22 @@ namespace INTRA_PTZ_client
             this.udpServices = new UDPservices(device);
         }
 
-        public void Connect()
+        public bool Connect()
         {
             try
             {
                 udpClient.Connect(Device.Ip, Device.Port);
                 udpClient.BeginReceive(new AsyncCallback(Received), null);
                 Device.SetOnline(true);
+                return true;
             }
             catch (Exception e)
             {
                 System.Diagnostics.Trace.WriteLine(e.ToString());
                 Device.SetOnline(false);
+                return false;
             }
         }
-
         public void Disconnect()
         {
             try
@@ -54,7 +55,7 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void getFirstData()
+        public void GetFirstData()
         {
             if (Device.GetMaxStepPan() == 0 || Device.GetMaxStepTilt() == 0 || Device.GetMaxStepZoom() == 0 || Device.GetMaxStepFocus() == 0)
             {
@@ -64,7 +65,7 @@ namespace INTRA_PTZ_client
                 list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
                 list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
                 
-                udpServices.addTaskToBegin(list);
+                udpServices.AddTaskToBegin(list);
                 //TODO
                 /*
                 list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0D), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //слева
@@ -75,7 +76,6 @@ namespace INTRA_PTZ_client
                 
             }
         }
-
         public void SendCommand(UdpCommand udpCommand)
         {
             try

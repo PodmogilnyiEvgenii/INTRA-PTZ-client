@@ -59,8 +59,7 @@ namespace INTRA_PTZ_client
                     if (!device.GetOnline())
                     {
                         if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Connecting...");
-                        device.Udp.Connect();
-                        device.Udp.getFirstData();
+                        if (device.Udp.Connect()) device.Udp.GetFirstData();
                     }
 
                     List<UdpCommand> commandsList = messageQueue.Dequeue();
@@ -72,7 +71,7 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void addTaskToEnd(List<UdpCommand> task)
+        public void AddTaskToEnd(List<UdpCommand> task)
         {
             if (messageQueue.Count < 5) { messageQueue.Enqueue(task); }
             else
@@ -81,7 +80,7 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void addTaskToBegin(List<UdpCommand> task)
+        public void AddTaskToBegin(List<UdpCommand> task)
         {
             if (messageQueue.Count < 5)
             {

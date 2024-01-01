@@ -53,7 +53,7 @@ namespace INTRA_PTZ_client
             mainWindow.Device.Port = int.Parse(port.Text);
             mainWindow.Device.Address = int.Parse(address.Text);
 
-            mainWindow.Device.Udp.getFirstData();
+            mainWindow.Device.Udp.GetFirstData();
 
             optionsWindow.Visibility = Visibility.Hidden;
 

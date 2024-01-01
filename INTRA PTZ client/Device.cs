@@ -46,7 +46,7 @@ namespace INTRA_PTZ_client
         {
             this.mainWindow = mainWindow;
             this.udp = new UDP(mainWindow, this);
-            if (route == null) this.route = new Route();
+            if (route == null) this.route = new Route(this);
             if (preset == null) this.preset = new Preset();
         }
 
@@ -198,7 +198,7 @@ namespace INTRA_PTZ_client
 
         public String getStatusString()
         {
-            return "IP: " + ip + ":" + port + "   " + "Address: " + address + "   " + (isOnline ? "Online" : "Offline") + "   Pan:" + currentPan + "   Tilt:" + currentTilt;
+            return "IP: " + ip + ":" + port + "   " + "Address: " + address + "   " + (isOnline ? "Online" : "Offline") + "   Pan: " + currentPan + "   Tilt: " + currentTilt;
         }
 
         public void parseRequest(byte[] request)

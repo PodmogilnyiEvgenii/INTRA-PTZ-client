@@ -4,11 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
-        mc:Ignorable="d"
-        
+        mc:Ignorable="d"        
         x:Name="routeWindow" Title="Маршрут" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
-
-    
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,13 +13,29 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>            
+            
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.Row="0" Margin="10,0,10,0">
-            <Button x:Name="startPauseRouteButton" Content="Старт" Margin="0,10,0,10" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="StartPauseRouteButton_Click">
+        <DockPanel Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" HorizontalAlignment="Center" >
+            <!--
+            <TextBlock x:Name="routeStatusText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="Статус: ВЫКЛ   Шаг: 1   Таймер: 50"/>
+            -->
+        </DockPanel>
+        
+        <DockPanel Grid.Column="0" Grid.Row="1" Margin="33,0,0,0" HorizontalAlignment="Left" >
+            <Button x:Name="startRouteButton" Content="Старт" Margin="0,10,0,10" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="StartRouteButton_Click">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="3"/>
+                    </Style>
+                </Button.Resources>
+            </Button>
+
+            <Button x:Name="pauseRouteButton" Content="Пауза" Margin="10,10,0,10" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="PauseRouteButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -38,9 +51,9 @@
                 </Button.Resources>
             </Button>
         </DockPanel>
-        
-        <DockPanel Grid.Column="0" Grid.Row="1" Height="300" Margin="10,0,10,0">
-            <DataGrid x:Name="routeTable" Margin="5,5,5,5"  SelectionMode="Single" AutoGenerateColumns="False">               
+
+        <DockPanel Grid.Column="0" Grid.Row="2" Height="300" Margin="10,0,10,0" >
+            <DataGrid x:Name="routeTable" Margin="5,5,5,5"  SelectionMode="Single" AutoGenerateColumns="False">
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="№" Binding="{Binding Count}" />
@@ -56,7 +69,7 @@
 
                     <DataGridTextColumn Header="Горизонталь" Binding="{Binding Pan}"/>
                     <DataGridTextColumn Header="Вертикаль" Binding="{Binding Tilt}"/>
-                    <DataGridTextColumn Header="Пауза" Binding="{Binding Timeout}"/>
+                    <DataGridTextColumn Header="Пауза, сек" Binding="{Binding Timeout}"/>
                 </DataGrid.Columns>
                 <DataGrid.ContextMenu>
                     <ContextMenu>
@@ -70,8 +83,8 @@
             </DataGrid>
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="2" Height="45" Margin="10,0,10,0" HorizontalAlignment="Center">
-            <Button x:Name="routeSaveButton" Content="Сохранить" Margin="5,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteSaveButton_Click">
+        <DockPanel Grid.Column="0" Grid.Row="3" Height="45" Margin="0,0,0,0" HorizontalAlignment="Center">
+            <Button x:Name="routeSaveButton" Content="Сохранить" Margin="0,10,0,0" Width="90" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Click="RouteSaveButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
@@ -88,7 +101,7 @@
             </Button>
         </DockPanel>
 
-        <StatusBar Grid.Column="0" Grid.Row="3" Margin="10,0,5,0" VerticalAlignment="Bottom">
+        <StatusBar Grid.Column="0" Grid.Row="4" Margin="10,0,5,0" VerticalAlignment="Center">
             <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>
             <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
                 <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
