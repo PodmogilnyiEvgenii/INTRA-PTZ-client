@@ -108,6 +108,9 @@ namespace INTRA_PTZ_client
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "ECI cfg files (*.cfg)|*.cfg";
+            openFileDialog.InitialDirectory= System.AppDomain.CurrentDomain.BaseDirectory;
+
+            
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -134,16 +137,13 @@ namespace INTRA_PTZ_client
                     }
                 }
             }
-
-
-
-
         }
         private void ConfigurationSave_Click(object sender, RoutedEventArgs e)
         {
             //menu
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "INTRA PTZ client cfg files (*.cfg) |*.cfg";
+            saveFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
             if (saveFileDialog.ShowDialog() == true)
             {
                 string fileName = saveFileDialog.FileName;
