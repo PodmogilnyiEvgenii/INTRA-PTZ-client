@@ -14,6 +14,7 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             
@@ -101,11 +102,22 @@
             </Button>
         </DockPanel>
 
-        <StatusBar Grid.Column="0" Grid.Row="4" Margin="10,0,5,0" VerticalAlignment="Center">
-            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>
-            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
-                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
-            </TextBlock>
+        <StatusBar Grid.Column="0" Grid.Row="4" Margin="7,0,0,0" >
+            <StatusBarItem >
+                <TextBlock x:Name="deviceDataText" Margin="0,0,0,0" Text="IP: 10.130.250.197    Адрес: 1"/>
+            </StatusBarItem>
+
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock  Margin="0,0,0,0" HorizontalAlignment="Right" >
+                    <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole" >WEB</Hyperlink>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+
+        <StatusBar Grid.Column="0" Grid.Row="5" Margin="7,0,0,0" >
+            <StatusBarItem >
+                <TextBlock x:Name="deviceCoordinatesText" Margin="0,0,0,0" Text="Положение: 00.00 / 00.00"/>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>

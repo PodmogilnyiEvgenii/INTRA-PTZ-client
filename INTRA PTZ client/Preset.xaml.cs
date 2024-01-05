@@ -63,5 +63,11 @@ namespace INTRA_PTZ_client
             device.Preset.DeleteRow();
             presetTable.ItemsSource = device.Preset.GetPresetList();
         }
+
+        private void TableMenuMoveToPreset_Click(object sender, RoutedEventArgs e)
+        {
+            //System.Diagnostics.Trace.WriteLine(presetTable.SelectedIndex);
+            device.MainWindow.MoveToPreset(presetTable.SelectedIndex);
+        }
     }
 }

@@ -33,10 +33,11 @@ namespace INTRA_PTZ_client
 
             this.optionsWindow = new OptionsWindow(this);
             this.routeWindow = new RouteWindow(device);
-            this.serviceWindow = new ServiceWindow(this);
+            this.serviceWindow = new ServiceWindow(device);
             this.presetWindow = new PresetWindow(device);
 
-            deviceDataText.Text = device.getStatusString();
+            deviceDataText.Text = device.GetStatusString();
+            deviceCoordinatesText.Text = device.GetCoordinatesString();
             zoomField.IsEnabled = false;
             focusField.IsEnabled = false;
 
@@ -66,16 +67,23 @@ namespace INTRA_PTZ_client
 
         private void RefreshTimer_Tick(object? sender, EventArgs e)
         {
-            String statusString = device.getStatusString();
+            String statusString = device.GetStatusString();
+            String coordinatesString = device.GetCoordinatesString();
 
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                             deviceDataText.Text = statusString));
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            deviceCoordinatesText.Text = coordinatesString));
 
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                             serviceWindow.deviceDataText.Text = statusString));
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            serviceWindow.deviceCoordinatesText.Text = coordinatesString));
 
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                             routeWindow.deviceDataText.Text = statusString));
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                            routeWindow.deviceCoordinatesText.Text = coordinatesString));
 
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
                     routeWindow.Title = device.Route.RouteService.GetRouteStatusString()));
@@ -112,6 +120,10 @@ namespace INTRA_PTZ_client
                         Device device = JsonConvert.DeserializeObject<Device>(textReader.ReadToEnd());
                         device.MainWindow = this;
                         device.Udp = new UDP(this, device);
+                        this.optionsWindow = new OptionsWindow(this);
+                        this.routeWindow = new RouteWindow(device);
+                        this.serviceWindow = new ServiceWindow(device);
+                        this.presetWindow = new PresetWindow(device);
 
                         this.device = device;
                         //MessageBox.Show("Конфигурация загружена!");
@@ -202,25 +214,25 @@ namespace INTRA_PTZ_client
             if (panValue > device.MaxPan || panValue < device.MinPan) panValue = device.GetCurrentPan();
             if (tiltValue > device.MaxTilt || tiltValue < device.MinTilt) tiltValue = device.GetCurrentTilt();
 
-            byte[] pan = BitConverter.GetBytes(Device.panAngleToStep(panValue.ToString()));
-            byte[] tilt = BitConverter.GetBytes(Device.tiltAngleToStep(tiltValue.ToString()));
+            byte[] pan = BitConverter.GetBytes(Device.PanAngleToStep(panValue.ToString()));
+            byte[] tilt = BitConverter.GetBytes(Device.TiltAngleToStep(tiltValue.ToString()));
 
             //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
             //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
 
-            if (AppOptions.DEBUG && device.CurrentStepPan == Device.panAngleToStep(panValue.ToString()) && device.CurrentStepTilt == Device.tiltAngleToStep(tiltValue.ToString()))
+            if (AppOptions.DEBUG && device.CurrentStepPan == Device.PanAngleToStep(panValue.ToString()) && device.CurrentStepTilt == Device.TiltAngleToStep(tiltValue.ToString()))
             {
-                System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " + Device.panAngleToStep(panValue.ToString()) + " tilt= " + Device.tiltAngleToStep(tiltValue.ToString()));
+                System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " + Device.PanAngleToStep(panValue.ToString()) + " tilt= " + Device.TiltAngleToStep(tiltValue.ToString()));
             }
 
             List<UdpCommand> list = new List<UdpCommand>();
-            if (device.CurrentStepPan != Device.panAngleToStep(panValue.ToString()))
+            if (device.CurrentStepPan != Device.PanAngleToStep(panValue.ToString()))
             {
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
             }
 
-            if (device.CurrentStepTilt != Device.tiltAngleToStep(tiltValue.ToString()))
+            if (device.CurrentStepTilt != Device.TiltAngleToStep(tiltValue.ToString()))
             {
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
@@ -406,9 +418,9 @@ namespace INTRA_PTZ_client
             if (AppOptions.DEBUG && Device.Preset.GetPresetList()[presetNumber].Pan == Device.GetCurrentPan() && Device.Preset.GetPresetList()[presetNumber].Tilt == Device.GetCurrentTilt())
             {
                 System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " +
-                Device.panAngleToStep(Device.Preset.GetPresetList()[presetNumber].Pan.ToString())
+                Device.PanAngleToStep(Device.Preset.GetPresetList()[presetNumber].Pan.ToString())
                 + " tilt= " +
-                Device.tiltAngleToStep(Device.Preset.GetPresetList()[presetNumber].Tilt.ToString())
+                Device.TiltAngleToStep(Device.Preset.GetPresetList()[presetNumber].Tilt.ToString())
                 );
             }
 

@@ -28,6 +28,8 @@ namespace INTRA_PTZ_client
         }
         private void RouteWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            deviceDataText.Text=device.GetStatusString();
+            deviceCoordinatesText.Text=device.GetCoordinatesString();
             savedRouteList = device.Route.GetRouteList();
             routeTable.ItemsSource = device.Route.GetRouteList();            
         }

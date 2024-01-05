@@ -19,5 +19,7 @@
         public static readonly int ERROR_TO_OFFLINE = 10;
 
         public static readonly int REFRESH_STATUS = 200;
+
+        public static readonly int MAX_COMMAND_IN_QUEUE = 20;
     }
 }

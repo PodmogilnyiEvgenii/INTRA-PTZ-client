@@ -32,7 +32,7 @@ namespace INTRA_PTZ_client
             {
                 udpClient.Connect(Device.Ip, Device.Port);
                 udpClient.BeginReceive(new AsyncCallback(Received), null);
-                Device.SetOnline(true);
+                //Device.SetOnline(true);
                 return true;
             }
             catch (Exception e)
@@ -57,76 +57,94 @@ namespace INTRA_PTZ_client
 
         public void GetFirstData()
         {
-            if (Device.GetMaxStepPan() == 0 || Device.GetMaxStepTilt() == 0 || Device.GetMaxStepZoom() == 0 || Device.GetMaxStepFocus() == 0)
-            {
+            List<UdpCommand> list = new List<UdpCommand>();
 
-                List<UdpCommand> list = new List<UdpCommand>();
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getAllMaxStepCoordinates"), 0x00, 0x00), "MaxStepFocus", AppOptions.UDP_TIMEOUT_SHORT));
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
-                
-                udpServices.AddTaskToBegin(list);
-                //TODO
-                /*
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0D), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //слева
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0E), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //справа
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0F), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //снизу
-                list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //сверху
-                */
-                
+            UdpCommand maxPan = new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getMaxStepPan"), 0x00, 0x00), "MaxStepPan", AppOptions.UDP_TIMEOUT_SHORT);
+            UdpCommand maxTilt = new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getMaxStepTilt"), 0x00, 0x00), "MaxStepTilt", AppOptions.UDP_TIMEOUT_SHORT);
+            UdpCommand getPan = new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT);
+            UdpCommand getTilt = new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT);
+
+            Queue<UdpCommand> queueUdpCommands = Device.Udp.UdpServices.GetMessageQueue();
+
+            if (Device.GetMaxStepPan() == 0 || Device.GetMaxStepTilt() == 0 /* || Device.GetMaxStepZoom() == 0 || Device.GetMaxStepFocus() == 0 */)
+            {
+                if (!queueUdpCommands.Contains(maxPan))
+                {
+                    list.Add(maxPan);
+                    //if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "maxPan not present");
+                }
+                if (!queueUdpCommands.Contains(maxTilt))
+                {
+                    list.Add(maxTilt);
+                    //if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "maxTilt not present");
+                }
             }
+
+            if (!queueUdpCommands.Contains(getPan)) list.Add(getPan);
+            if (!queueUdpCommands.Contains(getTilt)) list.Add(getTilt);
+
+            if (list.Count > 0) udpServices.AddTaskToBegin(list);
+            
+            //TODO
+            /*
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0D), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //слева
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0E), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //справа
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x0F), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //снизу
+            list.Add(new UdpCommand(PelcoDE.getCommand(mainWindow.Device.Address, 0x00, PelcoDE.getByteCommand("getRegister"), 0x00, 0x10), "Register", AppOptions.UDP_TIMEOUT_SHORT)); //сверху
+            */
         }
         public void SendCommand(UdpCommand udpCommand)
         {
             try
             {
-                if (Device.GetOnline())
+                //if (Device.GetOnline())
+                //{
+                lastAnswerString = "";
+                int count = 0;
+                TimeSpan timeout;
+
+                do
                 {
-                    lastAnswerString = "";
-                    int count = 0;
-                    TimeSpan timeout;
+                    udpClient.Send(udpCommand.Request, udpCommand.Request.Length);
+                    DateTime start = DateTime.Now;
+
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "=> | " + BitConverter.ToString(udpCommand.Request));
 
                     do
                     {
-                        udpClient.Send(udpCommand.Request, udpCommand.Request.Length);
-                        DateTime start = DateTime.Now;
+                        Task.WaitAll(new Task[] { Task.Delay(50) });
+                        timeout = DateTime.Now - start;
 
-                        if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "=> | " + BitConverter.ToString(udpCommand.Request));
+                    } while (!lastAnswerString.Equals(udpCommand.AnswerString) && timeout.TotalMilliseconds < udpCommand.Timeout);
 
-                        do
-                        {
-                            Task.WaitAll(new Task[] { Task.Delay(50) });
-                            timeout = DateTime.Now - start;
+                    count++;
 
-                        } while (!lastAnswerString.Equals(udpCommand.AnswerString) && timeout.TotalMilliseconds < udpCommand.Timeout);
-
-                        count++;
-
-                        if (AppOptions.DEBUG)
-                        {
-                            if (lastAnswerString.Equals(udpCommand.AnswerString))
-                            {
-                                System.Diagnostics.Trace.WriteLine("Answer in " + timeout.TotalMilliseconds + " mc | count " + count);
-                            }
-                            else
-                            {
-                                System.Diagnostics.Trace.WriteLine("No answer in " + timeout.TotalMilliseconds + " mc | count " + count);
-                            }
-                        }
-
-                    } while (lastAnswerString != udpCommand.AnswerString && count < AppOptions.UDP_TRY_COMMAND_SEND);
-
-                    if (timeout.TotalMilliseconds > udpCommand.Timeout)
+                    if (AppOptions.DEBUG)
                     {
-                        Device.SetOnline(false);
-                        device.AddAnswertErrorCount();
+                        if (lastAnswerString.Equals(udpCommand.AnswerString))
+                        {
+                            System.Diagnostics.Trace.WriteLine("Answer in " + timeout.TotalMilliseconds + " mc | count " + count);
+                        }
+                        else
+                        {
+                            System.Diagnostics.Trace.WriteLine("No answer in " + timeout.TotalMilliseconds + " mc | count " + count);
+                        }
                     }
 
-                }
-                else
+                } while (lastAnswerString != udpCommand.AnswerString && count < AppOptions.UDP_TRY_COMMAND_SEND);
+
+                if (count == AppOptions.UDP_TRY_COMMAND_SEND)
                 {
-                    System.Diagnostics.Trace.WriteLine("Send command but not online");
+                    Device.SetOnline(false);
+                    Device.AddAnswertErrorCount();
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\nDevice command error: " + Device.GetAnswertErrorCount());
                 }
+
+                //}
+                //else
+                //{
+                //    System.Diagnostics.Trace.WriteLine("Send command but not online");
+                //}
             }
             catch (Exception e)
             {
@@ -143,13 +161,13 @@ namespace INTRA_PTZ_client
             lastAnswerString = PelcoDE.getDescriptionRequest(received[3]);
             if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("<= | " + PelcoDE.getDescriptionRequest(received[3]) + " | " + BitConverter.ToString(received));
 
-            Device.parseRequest(received);
+            Device.ParseRequest(received);
 
             udpClient.BeginReceive(new AsyncCallback(Received), null);
             /*System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background,
                 new Action(() => mainWindow.ServiceWindow.answerTextBox.Text = BitConverter.ToString(received)));*/
         }
-        
+
     }
 
 }

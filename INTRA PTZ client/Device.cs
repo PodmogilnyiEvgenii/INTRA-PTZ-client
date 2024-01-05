@@ -126,7 +126,7 @@ namespace INTRA_PTZ_client
         public void SetCurrentPan(byte hh, byte ll)
         {
             currentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            currentPan = (float)panStepToAngle(currentStepPan);
+            currentPan = (float)PanStepToAngle(currentStepPan);
 
             //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan - MinPan) / maxStepPan, 1);
 
@@ -140,7 +140,7 @@ namespace INTRA_PTZ_client
         public void SetCurrentTilt(byte hh, byte ll)
         {
             currentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            currentTilt = (float)tiltStepToAngle(currentStepTilt);
+            currentTilt = (float)TiltStepToAngle(currentStepTilt);
 
             //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt - MinTilt) / maxStepTilt, 1);
 
@@ -196,12 +196,19 @@ namespace INTRA_PTZ_client
         }
 
 
-        public String getStatusString()
+        public String GetStatusString()
         {
-            return "IP: " + ip + ":" + port + "   " + "Address: " + address + "   " + (isOnline ? "Online" : "Offline") + "   Pan: " + currentPan + "   Tilt: " + currentTilt;
+            //return "IP: " + ip + ":" + port + " " + "Адрес: " + address + " " + (isOnline ? "Online" : "Offline") + " Гориз.: " + currentPan + " Верт.: " + currentTilt;
+            return "IP: " + ip + ":" + port + "    " + "Адрес: " + address + "    " + (isOnline ? "Online" : "Offline");
+            
         }
 
-        public void parseRequest(byte[] request)
+        public String GetCoordinatesString()
+        {            
+            return "Положение: " + currentPan + " / " + currentTilt;
+        }
+
+        public void ParseRequest(byte[] request)
         {
             if (request[1] == address)
             {
@@ -242,7 +249,7 @@ namespace INTRA_PTZ_client
             return res;
         }
 
-        public int panAngleToStep(string angle)
+        public int PanAngleToStep(string angle)
         {
             try
             {
@@ -254,12 +261,12 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public float panStepToAngle(int currentStepPan)
+        public float PanStepToAngle(int currentStepPan)
         {
             return currentStepPan / maxStepPan * (maxPan - minPan) + minPan;
         }
 
-        public int tiltAngleToStep(string angle)
+        public int TiltAngleToStep(string angle)
         {
             try
             {
@@ -270,7 +277,7 @@ namespace INTRA_PTZ_client
                 return -1;
             }
         }
-        public float tiltStepToAngle(int currentStepTilt)
+        public float TiltStepToAngle(int currentStepTilt)
         {
             return currentStepTilt / maxStepTilt * (maxTilt - minTilt) + minTilt;
         }

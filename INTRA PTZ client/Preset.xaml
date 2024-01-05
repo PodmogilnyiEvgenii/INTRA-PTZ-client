@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:INTRA_PTZ_client"
         mc:Ignorable="d"        
-        x:Name="presetWindow" Title="Настройка пресетов" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
+        x:Name="presetWindow" Title="Предустановки" HorizontalAlignment="Left" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -40,6 +40,11 @@
                     <DataGridTextColumn Width="100" Header="Горизонталь" Binding="{Binding Pan}"/>
                     <DataGridTextColumn Width="100" Header="Вертикаль" Binding="{Binding Tilt}"/>
                 </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="tableMenuMoveToPreset" Header="Установить положение" Click="TableMenuMoveToPreset_Click"/>                        
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
             </DataGrid>
         </DockPanel>
             
