@@ -81,6 +81,9 @@ namespace INTRA_PTZ_client
         private void ConfigurationLoad_Click(object sender, RoutedEventArgs e)
         {
             //menu
+
+
+
         }
         private void ConfigurationSave_Click(object sender, RoutedEventArgs e)
         {
