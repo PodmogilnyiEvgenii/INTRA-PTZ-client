@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Timers;
+using System.Windows.Documents;
 using Timer = System.Timers.Timer;
 
 namespace INTRA_PTZ_client
@@ -10,10 +11,10 @@ namespace INTRA_PTZ_client
     {
         private Device device;
         private Timer coordinatesTimer = new Timer(AppOptions.REQUEST_COORDINATE_TIMEOUT);
-        private Queue<List<UdpCommand>> messageQueue = new Queue<List<UdpCommand>>();
+        private Queue<UdpCommand> messageQueue = new Queue<UdpCommand>();
         private bool isTimerOnline = false;
 
-        public Timer CoordinatesTimer { get => coordinatesTimer; set => coordinatesTimer = value; }
+        public Timer CoordinatesTimer { get => coordinatesTimer; set => coordinatesTimer = value; }               
 
         public UDPservices(Device device)
         {
@@ -24,6 +25,11 @@ namespace INTRA_PTZ_client
 
             Thread queueService = new Thread(new ThreadStart(OnMessageQueue));
             queueService.Start();
+        }
+
+        public Queue<UdpCommand> GetMessageQueue()
+        {
+            return messageQueue;
         }
 
         public bool GetIsTimerOnline()
@@ -39,12 +45,13 @@ namespace INTRA_PTZ_client
 
         private void OnCoorditatesTimerEvent(Object source, ElapsedEventArgs e)
         {
-            if (messageQueue.Count < 3)
+            if (GetMessageQueue().Count <= AppOptions.MAX_COMMAND_IN_QUEUE)
             {
                 List<UdpCommand> list = new List<UdpCommand>();
                 list.Add(new UdpCommand(PelcoDE.getCommand(device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
                 list.Add(new UdpCommand(PelcoDE.getCommand(device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
-                messageQueue.Enqueue(list);
+
+                AddTaskToEnd(list);
             }
         }
 
@@ -52,50 +59,60 @@ namespace INTRA_PTZ_client
         {
             while (true)
             {
-                if (messageQueue.Count > 0)
-                {
-                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "Start task (last " + (messageQueue.Count - 1) + ")");
-
+                if (GetMessageQueue().Count > 0)
+                {  
                     if (!device.GetOnline())
                     {
-                        if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Connecting...");
-                        device.Udp.Connect();
-                        device.Udp.getFirstData();
+                        if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Connecting...");                       //TODO
+
+                        if (device.Udp.Connect()) { device.Udp.GetFirstData(); }
                     }
 
-                    List<UdpCommand> commandsList = messageQueue.Dequeue();
-                    for (int i = 0; i < commandsList.Count; i++)
+                    if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\n" + "Start task (last " + (GetMessageQueue().Count - 1) + ")");
+
+                    device.Udp.SendCommand(GetMessageQueue().Dequeue());
+
+                    if (device.GetAnswertErrorCount() >= AppOptions.ERROR_TO_OFFLINE)
                     {
-                        device.Udp.SendCommand(commandsList[i]);
+                        device.ResetAnswertErrorCount();
+                        device.Udp.UdpServices.CleanQueue();
+                        if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("\nDevice offline");
                     }
                 }
             }
         }
 
-        public void addTaskToEnd(List<UdpCommand> task)
+        public void AddTaskToEnd(List<UdpCommand> task)
         {
-            if (messageQueue.Count < 5) { messageQueue.Enqueue(task); }
+            if (GetMessageQueue().Count <= AppOptions.MAX_COMMAND_IN_QUEUE)
+            {
+                for (int i = 0; i < task.Count; i++)
+                {
+                    GetMessageQueue().Enqueue(task[i]);
+                }
+            }
             else
             {
                 if (AppOptions.DEBUG) System.Diagnostics.Trace.WriteLine("Too many tasks");
             }
         }
 
-        public void addTaskToBegin(List<UdpCommand> task)
+        public void AddTaskToBegin(List<UdpCommand> task)
         {
-            if (messageQueue.Count < 5)
+            if (GetMessageQueue().Count <= AppOptions.MAX_COMMAND_IN_QUEUE)
             {
-                List<List<UdpCommand>> listOfTasks = new List<List<UdpCommand>>();
-                listOfTasks.Add(task);
+                List<UdpCommand> listOfTasks = new List<UdpCommand>(task);
 
-                while (messageQueue.Count > 0)
+                while (GetMessageQueue().Count > 0)
                 {
-                    listOfTasks.Add(messageQueue.Dequeue());
+                    listOfTasks.Add(GetMessageQueue().Dequeue());
                 }
+
+                GetMessageQueue().Clear();
 
                 for (int i = 0; i < listOfTasks.Count; i++)
                 {
-                    messageQueue.Enqueue(listOfTasks[i]);
+                    GetMessageQueue().Enqueue(listOfTasks[i]);
                 }
             }
             else
@@ -105,6 +122,11 @@ namespace INTRA_PTZ_client
 
 
 
+        }
+
+        public void CleanQueue()
+        {
+            GetMessageQueue().Clear();
         }
     }
 }

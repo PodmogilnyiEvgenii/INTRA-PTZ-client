@@ -1,4 +1,7 @@
-﻿namespace INTRA_PTZ_client
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace INTRA_PTZ_client
 {
     public class UdpCommand
     {
@@ -27,5 +30,16 @@
             this.answer = PelcoDE.getRequestByte(answerString);
         }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+            UdpCommand command = (UdpCommand)obj;
+
+
+            return //EqualityComparer<byte[]>.Default.Equals(Request, command.Request) &&
+                   Request.SequenceEqual(command.Request) &&
+                   AnswerString.Equals(command.AnswerString) &&
+                   Timeout == command.Timeout;
+        }
     }
 }

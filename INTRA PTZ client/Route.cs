@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace INTRA_PTZ_client
@@ -6,13 +7,17 @@ namespace INTRA_PTZ_client
     [Serializable]
     public class Route
     {
+        [JsonIgnore] private RouteService routeService;
+
+        [Serializable]
         public class RouteTableRow
         {
             public enum OperationTypeEnum
             {
                 Калибровка,
                 Координаты,
-                Пресет
+                Пресет,
+                В_начало
             }
 
             private List<string> operationTypeList = new List<string>();
@@ -32,9 +37,11 @@ namespace INTRA_PTZ_client
                 this.tilt = tilt;
                 this.timeout = timeout;
 
-                OperationTypeList.Add(Enum.GetName(typeof(OperationTypeEnum), 0));
-                OperationTypeList.Add(Enum.GetName(typeof(OperationTypeEnum), 1));
-                OperationTypeList.Add(Enum.GetName(typeof(OperationTypeEnum), 2));
+                for (int i = 0; i < Enum.GetValues(typeof(OperationTypeEnum)).Length; i++)
+                {
+                    operationTypeList.Add(Enum.GetName(typeof(OperationTypeEnum), i).Replace("_", " "));
+                }
+
             }
 
             public int Count { get => count; set => count = value; }
@@ -51,78 +58,62 @@ namespace INTRA_PTZ_client
         }
 
         private List<RouteTableRow> routeList = new List<RouteTableRow>();
-        [NonSerialized] private bool isStart = false;
-
-        public bool GetIsStart()
-        {
-            return isStart;
-        }
-        public void SetIsStart(bool value)
-        {
-            isStart = value;
-        }
+        public List<RouteTableRow> RouteList { get => routeList; set => routeList = value; }
+        public RouteService RouteService { get => routeService; set => routeService = value; }
 
         public List<RouteTableRow> GetRouteList()
         {
-            return routeList;
+            return RouteList;
         }
         public void SetRouteList(List<RouteTableRow> routeList)
         {
-            this.routeList = routeList;
+            this.RouteList = routeList;
         }
 
-        public Route()
+        public Route(Device device)
         {
-            routeList.Add(new RouteTableRow(1, 0, 0, 0, 60));
-            routeList.Add(new RouteTableRow(2, 1, 0, 0, 60));
-            routeList.Add(new RouteTableRow(3, 2, 0, 0, 60));
-            routeList.Add(new RouteTableRow(4, 0, 0, 0, 60));
-
+            this.routeService = new RouteService(device);
         }
 
-        public void addrouteListUp(int rowNumber)           
+        public void AddrouteListUp(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
                 if (i == rowNumber) newRouteList.Add(new RouteTableRow(i, 2, 0, 0, 0));
-                newRouteList.Add(routeList[i]);
+                newRouteList.Add(RouteList[i]);
             }
-            if (routeList.Count == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
+            if (RouteList.Count == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
 
-            SetRouteList(setRightOrder(newRouteList));
+            SetRouteList(SetRightOrder(newRouteList));
         }
-
-        public void addrouteListDown(int rowNumber)         
+        public void AddrouteListDown(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
                 if (i == rowNumber + 1) newRouteList.Add(new RouteTableRow(i, 2, 0, 0, 0));
-                newRouteList.Add(routeList[i]);
+                newRouteList.Add(RouteList[i]);
             }
-            if (routeList.Count == rowNumber || routeList.Count - 1 == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
+            if (RouteList.Count == rowNumber || RouteList.Count - 1 == rowNumber) newRouteList.Add(new RouteTableRow(rowNumber, 2, 0, 0, 0));
 
-            SetRouteList(setRightOrder(newRouteList));
+            SetRouteList(SetRightOrder(newRouteList));
         }
-
-        public void routeListDeleteRow(int rowNumber)
+        public void RouteListDeleteRow(int rowNumber)
         {
             List<RouteTableRow> newRouteList = new List<RouteTableRow>();
-            for (int i = 0; i < routeList.Count; i++)
+            for (int i = 0; i < RouteList.Count; i++)
             {
-                if (i != rowNumber) newRouteList.Add(routeList[i]);
+                if (i != rowNumber) newRouteList.Add(RouteList[i]);
             }
 
-            SetRouteList(setRightOrder(newRouteList));
+            SetRouteList(SetRightOrder(newRouteList));
         }
-
-        public void routeListDeleteAll()
+        public void RouteListDeleteAll()
         {
             SetRouteList(new List<RouteTableRow>());
         }
-
-        private List<RouteTableRow> setRightOrder(List<RouteTableRow> list)
+        private List<RouteTableRow> SetRightOrder(List<RouteTableRow> list)
         {
             for (int i = 0; i < list.Count; i++)
             {
@@ -131,10 +122,9 @@ namespace INTRA_PTZ_client
 
             return list;
         }
-
-        public void setRouteTypeByIndex(int index, int type)
+        public void SetRouteTypeByIndex(int index, int type)
         {
-            routeList[index].OperationType = type;
+            RouteList[index].OperationType = type;
         }
 
     }

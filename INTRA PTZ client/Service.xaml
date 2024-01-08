@@ -81,30 +81,40 @@
             </StackPanel>
         </DockPanel>
 
-        <DockPanel Grid.Column="1" Grid.Row="2" Height="20" Margin="10,0,10,0">
+        <DockPanel Grid.Column="0" Grid.Row="2" Height="20" Margin="10,0,10,0">
         </DockPanel>
 
         <DockPanel Grid.Column="0" Grid.Row="3" Height="20" Margin="10,0,10,0">            
         </DockPanel>
 
-        <DockPanel Grid.Column="0" Grid.Row="4" Height="20" Margin="10,0,10,0">            
-        </DockPanel>
-
-        <DockPanel Grid.Column="0" Grid.Row="5" Height="45" Margin="10,0,10,0" HorizontalAlignment="Center">
+        <DockPanel Grid.Column="0" Grid.Row="4" Height="45" Margin="10,0,10,0" HorizontalAlignment="Center">
             <Button x:Name="serviceCloseButton" Content="Закрыть" Margin="0,10,0,0" Width="90" Height="25"  VerticalAlignment="Top" Click="ServiceCloseButton_Click">
                 <Button.Resources>
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="3"/>
                     </Style>
                 </Button.Resources>
-            </Button>            
+            </Button>
         </DockPanel>
-        
-        <StatusBar Grid.Column="0" Grid.Row="6" Margin="10,0,5,0" VerticalAlignment="Bottom">
-            <TextBlock x:Name="deviceDataText" Height="20" HorizontalAlignment="Left" Margin="0,5,0,0" VerticalAlignment="Top" Text="IP: 192.168.1.1:8888   Address: 1   Offline   Pan:0   Tilt:0"/>
-            <TextBlock  Height="20" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top">
-                <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="" RequestNavigate="Hyperlink_OpenWebConsole">WEB</Hyperlink>
-            </TextBlock>
+
+
+
+        <StatusBar Grid.Column="0" Grid.Row="5" Margin="7,0,0,0" >
+            <StatusBarItem >
+                <TextBlock x:Name="deviceDataText" Margin="0,0,0,0" Text="IP: 10.130.250.197    Адрес: 1"/>
+            </StatusBarItem>
+
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock  Margin="0,0,0,0" HorizontalAlignment="Right" >
+                    <Hyperlink x:Name="deviceWebConsoleText" NavigateUri="http://192.168.1.1" RequestNavigate="Hyperlink_OpenWebConsole" >WEB</Hyperlink>
+                </TextBlock>
+            </StatusBarItem>
+        </StatusBar>
+
+        <StatusBar Grid.Column="0" Grid.Row="6" Margin="7,0,0,0" >
+            <StatusBarItem >
+                <TextBlock x:Name="deviceCoordinatesText" Margin="0,0,0,0" Text="Положение: 00.00 / 00.00"/>
+            </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>
