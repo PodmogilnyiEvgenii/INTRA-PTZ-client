@@ -13,6 +13,10 @@ using System.Windows.Threading;
 using static INTRA_PTZ_client.Preset;
 using static INTRA_PTZ_client.Route;
 
+//TODO
+//1) при первоначальном перемещении по tilt неправильно выставляется. 
+//2) таймаут у  повтора
+
 namespace INTRA_PTZ_client
 {
     public partial class MainWindow : Window
@@ -49,14 +53,15 @@ namespace INTRA_PTZ_client
             //Device.Udp.getFirstData();            
 
             List<Route.RouteTableRow> routeList = new List<Route.RouteTableRow>();
-            routeList.Add(new RouteTableRow(1, 0, 0, 0, 10));
+            routeList.Add(new RouteTableRow(1, 0, 0, 0, 0));
             routeList.Add(new RouteTableRow(2, 1, 0, 0, 10));
             routeList.Add(new RouteTableRow(3, 2, 0, 0, 10));
-            routeList.Add(new RouteTableRow(4, 3, 0, 0, 10));
+            routeList.Add(new RouteTableRow(4, 3, 0, 0, 0));
             Device.Route.SetRouteList(routeList);
 
             List<Preset.PresetTableRow> presetList = new List<Preset.PresetTableRow>();
-            for (int i = 1; i <= 20; i++)
+            presetList.Add(new PresetTableRow(1, 90, 45));
+            for (int i = 2; i <= 20; i++)
             {
                 presetList.Add(new PresetTableRow(i, 0, 0));
             }
@@ -108,9 +113,9 @@ namespace INTRA_PTZ_client
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "ECI cfg files (*.cfg)|*.cfg";
-            openFileDialog.InitialDirectory= System.AppDomain.CurrentDomain.BaseDirectory;
+            openFileDialog.InitialDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
 
-            
+
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -211,37 +216,44 @@ namespace INTRA_PTZ_client
 
         public void MoveToCoordinates(float panValue, float tiltValue)
         {
-            if (panValue > device.MaxPan || panValue < device.MinPan) panValue = device.GetCurrentPan();
-            if (tiltValue > device.MaxTilt || tiltValue < device.MinTilt) tiltValue = device.GetCurrentTilt();
+            //if (panValue > device.MaxPan || panValue < device.MinPan) panValue = device.GetCurrentPan();
+            //if (tiltValue > device.MaxTilt || tiltValue < device.MinTilt) tiltValue = device.GetCurrentTilt();
 
-            byte[] pan = BitConverter.GetBytes(Device.PanAngleToStep(panValue.ToString()));
-            byte[] tilt = BitConverter.GetBytes(Device.TiltAngleToStep(tiltValue.ToString()));
-
-            //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
-            //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
-
-            if (AppOptions.DEBUG && device.CurrentStepPan == Device.PanAngleToStep(panValue.ToString()) && device.CurrentStepTilt == Device.TiltAngleToStep(tiltValue.ToString()))
+            if (panValue > device.MaxPan || panValue < device.MinPan || tiltValue > device.MaxTilt || tiltValue < device.MinTilt)
             {
-                System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " + Device.PanAngleToStep(panValue.ToString()) + " tilt= " + Device.TiltAngleToStep(tiltValue.ToString()));
+                MessageBox.Show("Неверные координаты!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            List<UdpCommand> list = new List<UdpCommand>();
-            if (device.CurrentStepPan != Device.PanAngleToStep(panValue.ToString()))
+            else
             {
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+                byte[] pan = BitConverter.GetBytes(Device.PanAngleToStep(panValue.ToString()));
+                byte[] tilt = BitConverter.GetBytes(Device.TiltAngleToStep(tiltValue.ToString()));
+
+                //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
+                //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
+
+                if (AppOptions.DEBUG && device.CurrentStepPan == Device.PanAngleToStep(panValue.ToString()) && device.CurrentStepTilt == Device.TiltAngleToStep(tiltValue.ToString()))
+                {
+                    System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " + Device.PanAngleToStep(panValue.ToString()) + " tilt= " + Device.TiltAngleToStep(tiltValue.ToString()));
+                }
+
+                List<UdpCommand> list = new List<UdpCommand>();
+                if (device.CurrentStepPan != Device.PanAngleToStep(panValue.ToString()) || !device.GetOnline())
+                {
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+                }
+
+                if (device.CurrentStepTilt != Device.TiltAngleToStep(tiltValue.ToString()) || !device.GetOnline())
+                {
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+                }
+
+                //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
+                //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
+
+                Device.Udp.UdpServices.AddTasksToEnd(list);
             }
-
-            if (device.CurrentStepTilt != Device.TiltAngleToStep(tiltValue.ToString()))
-            {
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
-            }
-
-            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
-            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
-
-            Device.Udp.UdpServices.AddTaskToEnd(list);
         }
         private void SetCoordinatesButton_Click(object sender, RoutedEventArgs e)
         {
@@ -286,7 +298,7 @@ namespace INTRA_PTZ_client
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
             }
-            Device.Udp.UdpServices.AddTaskToEnd(list);
+            Device.Udp.UdpServices.AddTasksToEnd(list);
         }
 
         public void CalibratePlatform()
@@ -300,7 +312,7 @@ namespace INTRA_PTZ_client
                 list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), 0x00, 0x00), "Done", AppOptions.UDP_TIMEOUT_LONG));
 
             list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("makeTest"), 0x00, 0x00), "Done", AppOptions.UDP_TIMEOUT_LONG));
-            Device.Udp.UdpServices.AddTaskToEnd(list);
+            Device.Udp.UdpServices.AddTasksToEnd(list);
         }
 
         private void Button7_Click(object sender, RoutedEventArgs e)
@@ -321,7 +333,8 @@ namespace INTRA_PTZ_client
         }
         private void Button5_Click(object sender, RoutedEventArgs e)
         {
-            CalibratePlatform();
+            //CalibratePlatform();
+            MessageBox.Show("Не реализовано");
         }
         private void Button6_Click(object sender, RoutedEventArgs e)
         {
@@ -356,7 +369,7 @@ namespace INTRA_PTZ_client
             Regex regex = new Regex("[^0-9,]+");
             e.Handled = regex.IsMatch(e.Text);*/
 
-            Regex regex = new Regex(@"^[0-9]*(?:\.[0-9]*)?$");
+            Regex regex = new Regex(@"^[0-9]*(?:\,[0-9]*)?$");
             if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))
                 e.Handled = false;
             else
@@ -365,7 +378,7 @@ namespace INTRA_PTZ_client
         private void ValidationTiltField(object sender, TextCompositionEventArgs e)
         {
             //TODO validate min/max
-            Regex regex = new Regex(@"^[-0-9]*(?:\.[0-9]*)?$");
+            Regex regex = new Regex(@"^[-0-9]*(?:\,[0-9]*)?$");
             if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))
                 e.Handled = false;
             else
@@ -374,7 +387,7 @@ namespace INTRA_PTZ_client
         private void ValidationZoomField(object sender, TextCompositionEventArgs e)
         {
             //TODO validate min/max
-            Regex regex = new Regex(@"^[0-9]*(?:\.[0-9]*)?$");
+            Regex regex = new Regex(@"^[0-9]*(?:\,[0-9]*)?$");
             if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))
                 e.Handled = false;
             else
@@ -383,12 +396,11 @@ namespace INTRA_PTZ_client
         private void ValidationFocusField(object sender, TextCompositionEventArgs e)
         {
             //TODO validate min/max
-            Regex regex = new Regex(@"^[0-9]*(?:\.[0-9]*)?$");
+            Regex regex = new Regex(@"^[0-9]*(?:\,[0-9]*)?$");
             if (regex.IsMatch(e.Text) && !(e.Text == "." && ((TextBox)sender).Text.Contains(e.Text)))
                 e.Handled = false;
             else
                 e.Handled = true;
-
         }
 
         //status bar
@@ -405,42 +417,69 @@ namespace INTRA_PTZ_client
             float panValue = Device.Preset.GetPresetList()[presetNumber].Pan;
             float tiltValue = Device.Preset.GetPresetList()[presetNumber].Tilt;
 
-            if (panValue > device.MaxPan || panValue < device.MinPan) Device.Preset.GetPresetList()[presetNumber].Pan = Device.GetCurrentPan();
-            if (tiltValue > device.MaxTilt || tiltValue < 0) Device.Preset.GetPresetList()[presetNumber].Tilt = Device.GetCurrentTilt();
-
-            byte[] pan = BitConverter.GetBytes(Device.Preset.GetPresetList()[presetNumber].Pan);
-            byte[] tilt = BitConverter.GetBytes(Device.Preset.GetPresetList()[presetNumber].Tilt);
-
-            //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
-            //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
-
-
-            if (AppOptions.DEBUG && Device.Preset.GetPresetList()[presetNumber].Pan == Device.GetCurrentPan() && Device.Preset.GetPresetList()[presetNumber].Tilt == Device.GetCurrentTilt())
+            if (AppOptions.DEBUG)
             {
-                System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " +
-                Device.PanAngleToStep(Device.Preset.GetPresetList()[presetNumber].Pan.ToString())
-                + " tilt= " +
-                Device.TiltAngleToStep(Device.Preset.GetPresetList()[presetNumber].Tilt.ToString())
-                );
+                System.Diagnostics.Trace.WriteLine("\n" + "pan = " + panValue);
+                System.Diagnostics.Trace.WriteLine("\n" + "tilt = " + tiltValue);
             }
 
-            List<UdpCommand> list = new List<UdpCommand>();
-            if (Device.Preset.GetPresetList()[presetNumber].Pan != Device.GetCurrentPan())
+            //if (panValue > device.MaxPan || panValue < device.MinPan) Device.Preset.GetPresetList()[presetNumber].Pan = Device.GetCurrentPan();
+            //if (tiltValue > device.MaxTilt || tiltValue < 0) Device.Preset.GetPresetList()[presetNumber].Tilt = Device.GetCurrentTilt();
+
+            if (panValue > device.MaxPan || panValue < device.MinPan || tiltValue > device.MaxTilt || tiltValue < device.MinTilt)
             {
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+                MessageBox.Show("Неверные координаты!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
-            if (Device.Preset.GetPresetList()[presetNumber].Tilt == Device.GetCurrentTilt())
+            else
             {
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
-                list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+                int pan1 = Device.PanAngleToStep(panValue.ToString());
+                int tilt1 = Device.TiltAngleToStep(tiltValue.ToString());
+
+                if (AppOptions.DEBUG)
+                {
+                    System.Diagnostics.Trace.WriteLine("\n" + "pan = " + pan1);
+                    System.Diagnostics.Trace.WriteLine("\n" + "tilt = " + tilt1);
+                }
+
+                byte[] pan = BitConverter.GetBytes(pan1);
+                byte[] tilt = BitConverter.GetBytes(tilt1);
+
+                //byte[] zoom = BitConverter.GetBytes(Device.panAngleToStep(zoomField.Text));
+                //byte[] focus = BitConverter.GetBytes(Device.panAngleToStep(focusField.Text));
+
+                if (AppOptions.DEBUG)
+                {
+                    System.Diagnostics.Trace.WriteLine("\n" + "pan = " + pan[1] + " / " + pan[0]);
+                    System.Diagnostics.Trace.WriteLine("\n" + "tilt = " + tilt[1] + " / " + tilt[0]);
+                }
+
+                if (AppOptions.DEBUG && Device.Preset.GetPresetList()[presetNumber].Pan == Device.GetCurrentPan() && Device.Preset.GetPresetList()[presetNumber].Tilt == Device.GetCurrentTilt())
+                {
+                    System.Diagnostics.Trace.WriteLine("Same coordinates | pan= " +
+                    Device.PanAngleToStep(Device.Preset.GetPresetList()[presetNumber].Pan.ToString())
+                    + " tilt= " +
+                    Device.TiltAngleToStep(Device.Preset.GetPresetList()[presetNumber].Tilt.ToString())
+                    );
+                }
+
+                List<UdpCommand> list = new List<UdpCommand>();
+                if (Device.Preset.GetPresetList()[presetNumber].Pan != Device.GetCurrentPan() || !device.GetOnline())
+                {
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setPan"), pan[1], pan[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
+                }
+
+                if (Device.Preset.GetPresetList()[presetNumber].Tilt == Device.GetCurrentTilt() || !device.GetOnline())
+                {
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setTilt"), tilt[1], tilt[0]), "Done", AppOptions.UDP_TIMEOUT_LONG));
+                    list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
+                }
+
+                //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
+                //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
+
+                Device.Udp.UdpServices.AddTasksToEnd(list);
             }
-
-            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setZoom"), tilt[1], tilt[0]), "Zoom", AppOptions.UDP_TIMEOUT_SHORT));
-            //list.Add(new UdpCommand(PelcoDE.getCommand(Device.Address, 0x00, PelcoDE.getByteCommand("setFocus"), tilt[1], tilt[0]), "Focus", AppOptions.UDP_TIMEOUT_SHORT));
-
-            Device.Udp.UdpServices.AddTaskToEnd(list);
         }
 
         public void updateTooltips()

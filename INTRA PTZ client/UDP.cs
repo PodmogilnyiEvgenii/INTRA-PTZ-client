@@ -83,7 +83,7 @@ namespace INTRA_PTZ_client
             if (!queueUdpCommands.Contains(getPan)) list.Add(getPan);
             if (!queueUdpCommands.Contains(getTilt)) list.Add(getTilt);
 
-            if (list.Count > 0) udpServices.AddTaskToBegin(list);
+            if (list.Count > 0) udpServices.AddTasksToBegin(list);
             
             //TODO
             /*

@@ -51,7 +51,7 @@ namespace INTRA_PTZ_client
                 list.Add(new UdpCommand(PelcoDE.getCommand(device.Address, 0x00, PelcoDE.getByteCommand("getPan"), 0x00, 0x00), "Pan", AppOptions.UDP_TIMEOUT_SHORT));
                 list.Add(new UdpCommand(PelcoDE.getCommand(device.Address, 0x00, PelcoDE.getByteCommand("getTilt"), 0x00, 0x00), "Tilt", AppOptions.UDP_TIMEOUT_SHORT));
 
-                AddTaskToEnd(list);
+                AddTasksToEnd(list);
             }
         }
 
@@ -82,13 +82,13 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void AddTaskToEnd(List<UdpCommand> task)
+        public void AddTasksToEnd(List<UdpCommand> tasks)
         {
             if (GetMessageQueue().Count <= AppOptions.MAX_COMMAND_IN_QUEUE)
             {
-                for (int i = 0; i < task.Count; i++)
+                for (int i = 0; i < tasks.Count; i++)
                 {
-                    GetMessageQueue().Enqueue(task[i]);
+                    GetMessageQueue().Enqueue(tasks[i]);
                 }
             }
             else
@@ -97,11 +97,11 @@ namespace INTRA_PTZ_client
             }
         }
 
-        public void AddTaskToBegin(List<UdpCommand> task)
+        public void AddTasksToBegin(List<UdpCommand> tasks)
         {
             if (GetMessageQueue().Count <= AppOptions.MAX_COMMAND_IN_QUEUE)
             {
-                List<UdpCommand> listOfTasks = new List<UdpCommand>(task);
+                List<UdpCommand> listOfTasks = new List<UdpCommand>(tasks);
 
                 while (GetMessageQueue().Count > 0)
                 {

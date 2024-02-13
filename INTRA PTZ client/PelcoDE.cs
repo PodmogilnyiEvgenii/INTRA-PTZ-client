@@ -28,8 +28,6 @@ namespace INTRA_PTZ_client
 
             descriptionCommands.Add("makeTest", 0x93);
 
-
-
             //descriptionCommands.Add("getAllCoordinates", 0x79);   //после поворота шлет фигню
             descriptionCommands.Add("getAllMaxStepCoordinates", 0x7B);
 

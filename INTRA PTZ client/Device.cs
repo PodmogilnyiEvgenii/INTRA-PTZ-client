@@ -30,8 +30,8 @@ namespace INTRA_PTZ_client
         //private int currentStepZoom = 0;
         //private int currentStepFocus = 0;
 
-        [JsonIgnore] private int maxStepPan = 0;
-        [JsonIgnore] private int maxStepTilt = 0;
+        [JsonIgnore] private int maxStepPan = 0;    //58319
+        [JsonIgnore] private int maxStepTilt = 0;   //29160
         [JsonIgnore] private int maxStepZoom = 0;
         [JsonIgnore] private int maxStepFocus = 0;
 
@@ -126,11 +126,14 @@ namespace INTRA_PTZ_client
         public void SetCurrentPan(byte hh, byte ll)
         {
             currentStepPan = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            currentPan = (float)PanStepToAngle(currentStepPan);
+            this.currentPan = (float)PanStepToAngle(currentStepPan);
 
             //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxPan - MinPan) / maxStepPan, 1);
-
-            //System.Diagnostics.Trace.WriteLine("set pan= " + CurrentStepPan);            
+            if (AppOptions.DEBUG)
+            {
+                System.Diagnostics.Trace.WriteLine("set pan= " + currentStepPan);
+                System.Diagnostics.Trace.WriteLine("set pan= " + currentPan);
+            }
         }
 
         public float GetCurrentTilt()
@@ -140,11 +143,15 @@ namespace INTRA_PTZ_client
         public void SetCurrentTilt(byte hh, byte ll)
         {
             currentStepTilt = BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 });
-            currentTilt = (float)TiltStepToAngle(currentStepTilt);
+            this.currentTilt = (float)TiltStepToAngle(currentStepTilt);
 
             //Math.Round(BitConverter.ToInt32(new byte[] { ll, hh, 0x00, 0x00 }) * (MaxTilt - MinTilt) / maxStepTilt, 1);
 
-            //System.Diagnostics.Trace.WriteLine("set tilt= " + CurrentStepTilt);            
+            if (AppOptions.DEBUG)
+            {
+                System.Diagnostics.Trace.WriteLine("set tilt= " + currentStepTilt);
+                System.Diagnostics.Trace.WriteLine("set tilt= " + currentTilt);
+            }
         }
 
         public int GetMaxStepPan()
@@ -200,12 +207,12 @@ namespace INTRA_PTZ_client
         {
             //return "IP: " + ip + ":" + port + " " + "Адрес: " + address + " " + (isOnline ? "Online" : "Offline") + " Гориз.: " + currentPan + " Верт.: " + currentTilt;
             return "IP: " + ip + ":" + port + "    " + "Адрес: " + address + "    " + (isOnline ? "Online" : "Offline");
-            
+
         }
 
         public String GetCoordinatesString()
-        {            
-            return "Положение: " + currentPan + " / " + currentTilt;
+        {
+            return "Положение: " + Math.Round(currentPan, 2) + " / " + Math.Round(currentTilt, 2);
         }
 
         public void ParseRequest(byte[] request)
@@ -253,7 +260,7 @@ namespace INTRA_PTZ_client
         {
             try
             {
-                return (int)Math.Round((float.Parse(angle) - minPan) * maxStepPan / (maxPan - minPan));
+                return (int)Math.Round((float.Parse(angle) - minPan) * (maxStepPan - 1) / (maxPan - minPan));
             }
             catch (Exception)
             {
@@ -263,7 +270,7 @@ namespace INTRA_PTZ_client
 
         public float PanStepToAngle(int currentStepPan)
         {
-            return currentStepPan / maxStepPan * (maxPan - minPan) + minPan;
+            return currentStepPan * (maxPan - minPan) / (maxStepPan - 1) + minPan;
         }
 
         public int TiltAngleToStep(string angle)
@@ -279,7 +286,7 @@ namespace INTRA_PTZ_client
         }
         public float TiltStepToAngle(int currentStepTilt)
         {
-            return currentStepTilt / maxStepTilt * (maxTilt - minTilt) + minTilt;
+            return currentStepTilt * (maxTilt - minTilt) / maxStepTilt + minTilt;
         }
 
     }

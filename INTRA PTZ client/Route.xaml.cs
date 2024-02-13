@@ -131,12 +131,13 @@ namespace INTRA_PTZ_client
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (System.Windows.Controls.ComboBox)sender;
-            DataGridRow dataGridRow = FindParent<DataGridRow>(comboBox);
+            DataGridRow dataGridRow = FindParent<DataGridRow>(comboBox);            
+
             int index = dataGridRow.GetIndex();
             string selected = comboBox.SelectedItem as string;
 
             int type = (int)Enum.Parse(typeof(Route.RouteTableRow.OperationTypeEnum), selected.Replace(" ", "_"));
-            DataGridCell cell = new DataGridCell();
+            DataGridCell cell = new DataGridCell();            
 
             switch (type)
             {
@@ -147,14 +148,17 @@ namespace INTRA_PTZ_client
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;  
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;                    
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;
 
                     cell = routeTable.Columns[4].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;
                     break;
 
                 case 1:     //Координаты
@@ -164,14 +168,17 @@ namespace INTRA_PTZ_client
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 90;
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 45;
 
                     cell = routeTable.Columns[4].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 5;
                     break;
 
                 case 2:     //Пресет
@@ -181,14 +188,17 @@ namespace INTRA_PTZ_client
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 1;
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = "";
 
                     cell = routeTable.Columns[4].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Transparent;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 5;
                     break;
 
                 case 3:     //В начало
@@ -198,14 +208,17 @@ namespace INTRA_PTZ_client
                     cell = routeTable.Columns[2].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;
 
                     cell = routeTable.Columns[3].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;
 
                     cell = routeTable.Columns[4].GetCellContent(dataGridRow).Parent as DataGridCell;
                     cell.Background = Brushes.Black;
                     cell.Foreground = Brushes.Black;
+                    //cell.Content = 0;
                     break;
             }
         }
